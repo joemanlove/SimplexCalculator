@@ -38,25 +38,7 @@ class SimplexCalculator:
         self.window = QWidget()
         self.window.resize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.window.setMinimumSize(380, 480)
-        # self.window.setGeometry(QRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT))
-        # self.window.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.window.setWindowTitle("Simplex Method")
-        # self.window.setFocusPolicy(Qt.NoFocus)
-
-        # Create Pallettes -- Dark/Light Modes
-        # Dark Mode Colors
-        dark_bg1 = QColor(52, 52, 52)
-        dark_bg2 = QColor(42, 42, 42)
-        dark_text = QColor(255, 255, 255)
-        self.dark_palette = QPalette()
-        self.dark_palette.setColor(QPalette.Window, dark_bg1)
-        self.dark_palette.setColor(QPalette.WindowText, dark_text)
-        self.dark_palette.setColor(QPalette.Button, dark_bg1)
-        self.dark_palette.setColor(QPalette.ButtonText, dark_text)
-        self.dark_palette.setColor(QPalette.Base, dark_bg2)
-        self.dark_palette.setColor(QPalette.Text, dark_text)
-        # light_palette is the default palette
-        self.light_palette = QGuiApplication.palette()
 
         # Toggle Palette Button
         self.palette_mode = 1
@@ -172,13 +154,10 @@ class SimplexCalculator:
         setup_fields_layout.setSpacing(2)
         setup_fields_layout.setContentsMargins(4, 4, 4, 4)
         # Layout for solution steps.
-        # TODO: Rename
         self.soln_table_layout = QGridLayout()
         self.soln_table_layout.setSpacing(0)
         # Parent layout for solution layout is for proper spacing purposes
         soln_table_parent_layout = QGridLayout()
-        # self.soln_table_layout.setVerticalSpacing(0)
-        # self.soln_table_layout.setHorizontalSpacing(8)
         # Settings layout
         settings_layout = QGridLayout()
 
@@ -217,7 +196,7 @@ class SimplexCalculator:
         setup_buttons_layout.addWidget(reset_button,         3, 3, 1, 3)
         setup_buttons_layout.addWidget(calculate_button,     4, 0, 1, 6)
 
-        # Placement of setup fields -- objective function and constraint value fields
+        # Placement of objective function and constraint value fields
         setup_fields_layout.addItem(hori_spacer,          0, 0)
         setup_fields_layout.addLayout(constraints_layout, 0, 1, Qt.AlignTop)
         setup_fields_layout.addLayout(inequality_layout,  0, 2, Qt.AlignTop)
@@ -235,14 +214,12 @@ class SimplexCalculator:
         setup_scroll_area = QScrollArea()
         setup_scroll_area.setWidget(setup_scroll_widget)
         setup_scroll_area.setWidgetResizable(True)
-        setup_scroll_area.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
 
         soln_scroll_widget = QWidget()
         soln_scroll_widget.setLayout(soln_table_parent_layout)
         soln_scroll_area = QScrollArea()
         soln_scroll_area.setWidget(soln_scroll_widget)
         soln_scroll_area.setWidgetResizable(True)
-        soln_scroll_area.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
 
         # Placement of sub layouts in primary layouts
         setup_parent_layout.addWidget(settings_button,      0, 0, Qt.AlignRight)
@@ -257,18 +234,13 @@ class SimplexCalculator:
         settings_layout.addWidget(self.palette_button, 1, 0, Qt.AlignTop)
         settings_layout.addItem(hori_spacer,           0, 1)
 
-        # Placement of sublayouts within main parent layout
-        # parent_layout.addWidget(settings_button)
+        # Placement of primary sublayouts within main parent layout
         parent_layout.addWidget(self.setup_screen)
         parent_layout.addWidget(self.soln_screen)
         parent_layout.addWidget(self.settings_screen)
 
         # Create object which destroys/creates all constraint and variable editing fields
         self.simplex_setup = SimplexSetup(self.window, setup_fields_layout, variables_edit, constraints_edit)
-        # Create tabbing connection between max/min button and first field in objective function
-        # self.window.setTabOrder(self.max_min_button, self.simplex_setup.QLEVars[0])
-        # Create object which solves and displays various steps of problem
-        # self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup)
 
         # Override window's keyPressEvent to do things upon keystrokes
         self.window.keyPressEvent = self.key_pressed
@@ -323,11 +295,9 @@ class SimplexCalculator:
         if self.palette_mode:
             self.palette_button.setText("Dark Mode")
             self.window.setStyleSheet(SIMPLEX_STYLE_DARK)
-            # self.app.setPalette(self.dark_palette)
         else:
             self.palette_button.setText("Light Mode")
             self.window.setStyleSheet(SIMPLEX_STYLE_LIGHT)
-            # self.app.setPalette(self.light_palette)
         self.palette_mode = not self.palette_mode
 
     def toggle_max_min(self) -> None:
@@ -447,8 +417,8 @@ class SimplexSolve:
         
         Returns
         ---
-        List
-            Returns two matrices - The initial solution matrix and a corresponding label matrix.
+        tuple
+            Returns a tuple of two matrices -- the initial solution matrix and a corresponding label matrix.
 
         Example
         ---
@@ -514,3 +484,4 @@ class SimplexSolve:
 
 if __name__ == "__main__":
     simplex = SimplexCalculator()
+

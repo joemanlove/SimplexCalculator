@@ -194,7 +194,11 @@ class QLEVar(QLESimplex):
             qle.update_var_label(current_text)
 
     def get_name(self) -> str:
-        """Returns the value of the name_field's edit field. Used for solution table labeling.
+        """
+        Returns
+        ---
+        str
+            The value of the name_field's edit field. Used for solution table labeling.
         """
         return self.name_field.text()
 
@@ -252,7 +256,11 @@ class QLECon(QLESimplex):
         self.var_label.setText(new_name)
 
     def get_name(self) -> str:
-        """Returns the slack name. Used for solution table labeling.
+        """
+        Returns
+        ---
+        str
+            The slack name. Used for solution table labeling.
         """
         sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
         return f"S{self.row_index}".translate(sub)
@@ -300,6 +308,10 @@ class QLEInq(QLESimplex):
         self.add()
 
     def get_name(self) -> str:
-        """Returns the value of the edit field. Used to get name of objective function for solution table labeling.
+        """
+        Returns
+        ---
+            str
+                The value of the edit field. Used to get name of objective function for solution table labeling.
         """
         return self.text()

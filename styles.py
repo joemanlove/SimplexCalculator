@@ -11,6 +11,11 @@ def replace_colors(style: str, color_map: dict) -> str:
         https://doc.qt.io/qtforpython/overviews/stylesheet-examples.html
     color_map: dictionary
         Used to replace variable names with hexidecimal values
+
+    Returns
+    ---
+    str
+        A style sheet string for PyQt widget.
     """
     for key, val in color_map.items():
         style = style.replace(key, val)

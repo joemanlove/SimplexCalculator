@@ -156,6 +156,11 @@ class SimplexSetup:
         is_floats: boolean, optional
             Defaulted True. Set to False if a matrix of widget objects is desired, otherwise the matrix
             will contain the float casted field values.
+
+        Returns
+        ---
+        list
+            List of lists of floats or widgets from setup edit fields.
         """
         def get_component(widget):
             """Returns either a float of the value field or the widget itself depending on is_floats argument.
@@ -209,7 +214,7 @@ class SimplexSetup:
         range_one = range(1, 11)
         range_two = range(10, 61)
         def random_field_val(perc: int, range_one: range, range_two: range) -> str:
-            """Returns a string casted integer value.
+            """Returns a randomly generated integer string from two weighted ranges.
 
             Parameters
             ---
@@ -219,6 +224,11 @@ class SimplexSetup:
                 A range of values
             range_two: range
                 The second range of values to be chosen
+
+            Returns
+            ---
+            str
+                A string casted integer value.
             """
             p = randint(1, 100)
             return str(choice(range_one)) if p <= perc else str(choice(range_two))
