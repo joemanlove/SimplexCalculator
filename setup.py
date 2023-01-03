@@ -241,3 +241,7 @@ class SimplexSetup:
         for inq in self.QLEInqs[1:]:
             inq.setText(random_field_val(25, range_one, range_two))
 
+
+if __name__ == "__main__":
+    from simplex import SimplexCalculator
+    simplex = SimplexCalculator()
