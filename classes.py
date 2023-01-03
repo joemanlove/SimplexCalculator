@@ -143,7 +143,8 @@ class QLEVar(QLESimplex):
             The object index within the QLE_vars list which also corresponds to the column of the layout.
             Used for default variable name and determining the label text when object is in the first column.
         constraint_col: list
-            The list of associated constraint QLECon objects for variable name label updating
+            The list of associated constraint QLECon objects for variable name label updating.
+            This is a column of constraint fields in the setup screen.
         """
         QLESimplex.__init__(self, window, layout, row_index, col_index)
         self.constraint_col = constraint_col
@@ -311,7 +312,7 @@ class QLEInq(QLESimplex):
         """
         Returns
         ---
-            str
-                The value of the edit field. Used to get name of objective function for solution table labeling.
+        str
+            The value of the edit field. Used to get name of objective function for solution table labeling.
         """
         return self.text()

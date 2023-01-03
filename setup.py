@@ -2,10 +2,10 @@
 depending on constraint and variable numbers set by user.
 """
 
-
 from PyQt5.QtWidgets import QWidget, QLineEdit, QGridLayout
-from classes import QLEVar, QLECon, QLEInq
 from random import randint, choice
+from classes import QLEVar, QLECon, QLEInq
+
 
 class SimplexSetup:
     """Handles all objective funcion and constraint entry fields, dynamically updating from initial setup fields.
@@ -18,9 +18,9 @@ class SimplexSetup:
         layout: PyQt QGridLayout
             The layout of layouts where the QLECon/QLEVar and QLEInq objects are placed.
         variables_edit: PyQt QLineEdit
-            The "Set Variables" edit field object
+            The "Set Variables" edit field object.
         constraints_edit: PyQt QLineEdit
-            The "Set Constraints" edit field object
+            The "Set Constraints" edit field object.
         """
         self.window = window
         self.cons_layout = layout.children()[0]
@@ -60,7 +60,7 @@ class SimplexSetup:
 
         # Removing variable and associated contraint widgets
         if edit_var_num < crnt_var_num:
-            # Range reversal is nesesarry to avoid index out of range errors when removing items
+            # Reverse range to avoid index out of range errors when removing items
             for i in range(edit_var_num, crnt_var_num)[::-1]:
                 deleted_var = self.QLEVars.pop(i)
                 for qle_con in deleted_var.constraint_col:
@@ -90,8 +90,8 @@ class SimplexSetup:
 
         # Removing constraint widgets
         if edit_con_num < crnt_con_num:
-            # Range reversal is nesesarry to avoid index out of range errors when removing items
             for i in range(edit_con_num, crnt_con_num)[::-1]:
+                # Do not delete first element as it belongs to objective function
                 deleted_ineq = self.QLEInqs.pop(i + 1)
                 deleted_ineq.delete()
                 # Remove all QLECon objects in row
@@ -204,6 +204,7 @@ class SimplexSetup:
                 con.setText("")
         for inq in self.QLEInqs[1:]:
             inq.setText("")
+        self.QLEInqs[0].setText("Z")
 
     def randomize_fields(self) -> None:
         """Randomizes all initial setup value fields. Random values are integers based on specified ranges.
