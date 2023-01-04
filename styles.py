@@ -2,7 +2,7 @@
 """
 
 def replace_colors(style: str, color_map: dict) -> str:
-    """Replaces color variable names in a PyQt style sheet string with hexidecimal color values.
+    """Replaces color variable names in a PyQt style sheet (multi-line string) with hexidecimal color values.
 
     Parameters
     ---

@@ -6,8 +6,7 @@
 # Simplex Method Calculator for educational purposes.
 # George Dantzig's simplex linear programming algorithm for solving optimization problems.
 #
-# TODO: Display steps on solve screen
-#       Add minimize optimization functionality
+# TODO: Add minimize optimization functionality
 #       Redo buttons with icons
 #       Redo settings screen -- add text size input
 #       More detailed README.md with screenshots and examples

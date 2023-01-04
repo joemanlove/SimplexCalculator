@@ -42,7 +42,7 @@ class SimplexCalculator:
         self.app.setStyle("Fusion")
         self.window = QWidget()
         self.window.resize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
-        # self.window.setMinimumSize(380, 480) TODO
+        self.window.setMinimumSize(380, 480)
         self.window.setWindowTitle("Simplex Method")
 
         ### Setting Variables
@@ -117,7 +117,7 @@ class SimplexCalculator:
         calculate_button.setText("Calculate")
         calculate_button.clicked.connect(self.calculate)
 
-        # Back Vutton -- Go back to the previous screen.
+        # Back Button -- Go back to the previous screen.
         # Duplicate buttons are necessary because the same widget cannot be in two different frames or layouts
         back_button = QPushButton(self.window)
         back_button.setText("Back")
@@ -191,7 +191,7 @@ class SimplexCalculator:
         # Settings Layout
         settings_layout = QGridLayout()
 
-        # Spacers to force items in layouts into desired positions.
+        # Spacers to fill empty voids and force items in layouts into desired positions.
         hori_spacer = QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
         vert_spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         # print(dir(vert_spacer))
