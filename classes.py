@@ -6,7 +6,7 @@ QLECon: QLineEdit child
 QLEInq: QLineEdit child
 """
 
-from PyQt5.QtWidgets import QWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QPushButton, QLineEdit, QLabel, QGridLayout
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import Qt, QRegExp
 
@@ -55,15 +55,18 @@ class QLabelSimplex(QLabel):
         col_num: int
             The column number for placement within the given layout.
         borders: list
-            A list of strings indicating what borders will be drawn. Used to create lines of table
+            A list of strings indicating what borders will be drawn. Used to create lines of table.
+            Expected strings are "top", "bottom", "left", or "right".
         """
         QLabel.__init__(self, window)
         # Create border
+        # Below string will be divided into substrings, if a direction within borders is present,
+        # the substring is replaced with an empty string.
         style = "border-top-style:none; border-bottom-style:none; border-right-style:none; border-left-style:none;"
         style_list = style.split()
         for direction in borders:
-            for i, item in enumerate(style_list):
-                if direction in item:
+            for i, sub_str in enumerate(style_list):
+                if direction.lower() in sub_str:
                     style_list[i] = ""
                     break
         style = " ".join(style_list)
@@ -94,6 +97,7 @@ class QLESimplex(QLineEdit):
         QLineEdit.__init__(self, window)
         self.setMaximumWidth(42)
         self.setAlignment(Qt.AlignCenter)
+        # Limit field input to digits separated by a decimal and allows user to input an empty string to clear field.
         self.setValidator(QRegExpValidator(QRegExp('(^?[0-9]*\.?[0-9]+$|^$)')))
 
         self.layout = layout
@@ -127,7 +131,8 @@ class QLEVar(QLESimplex):
 
     Since these are created with a loop, a class wrapper becomes necessary to prevent the
     connected function from being associated with the last object created within the loop,
-    i.e. prevent cell variable from loop: https://pylint.pycqa.org/en/latest/user_guide/messages/warning/cell-var-from-loop.html
+    i.e. prevent cell variable from loop:
+    https://pylint.pycqa.org/en/latest/user_guide/messages/warning/cell-var-from-loop.html
     """
     def __init__(self, window: QWidget, layout: QGridLayout, row_index: int, col_index: int, constraint_col: list):
         """Child class of PyQt QLineEdit object. Component object for objective function.
@@ -138,7 +143,7 @@ class QLEVar(QLESimplex):
         window: PyQt QWidget
         layout: PyQt QGridLayout
         row_index: int
-            The row index
+            The row index. Determines positioning within layout.
         col_index: int
             The object index within the QLE_vars list which also corresponds to the column of the layout.
             Used for default variable name and determining the label text when object is in the first column.
@@ -167,7 +172,7 @@ class QLEVar(QLESimplex):
 
         label.setText(label_text)
 
-        # Add these in the order in which they appear.
+        # Add these in the order in which they appear in app.
         self.widgets.append(label)
         self.widgets.append(self)
         self.widgets.append(self.name_field)
@@ -184,7 +189,7 @@ class QLEVar(QLESimplex):
         """
         # Subscripts for defaulted name label
         sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-        # Prevent user from settting variable name to whitespace(s) with strip()
+        # Prevent user from setting variable name to whitespace(s) with strip()
         current_text = self.name_field.text().strip()
 
         if current_text == "":
@@ -218,16 +223,15 @@ class QLECon(QLESimplex):
         layout: PyQt QGridLayout
         row_index: int
             1 should be added to this upon initialization to account for the objective function row.
-            Used for 
         col_index: int
-            The object column index. Determines the label text when object is in the first column.
+            The object column index. Determines the label text when object is in the first column and
+            positioning within layout.
         """
         QLESimplex.__init__(self, window, layout, row_index, col_index)
-        # Text displayed will be connected to QLEVar name_field
+        # Text displayed will be connected to QLEVar name_field.
         self.var_label = QLabel(window)
         self.var_label.setIndent(1)
 
-        # Label will be "+" if not the first in a row, otherwise it will be constraint number label
         label = QLabel(window)
         label.setIndent(1)
         label.setAlignment(Qt.AlignLeft)
@@ -236,12 +240,14 @@ class QLECon(QLESimplex):
         # label.setStyleSheet(label_style)
         # label_text = f"Constraint {row_index}: " if col_index == 0 else "+"
         sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+        # Label will be "+" if not the first in a row, otherwise it will be constraint number label.
         label_text = f"C{row_index}:".translate(sub) if col_index == 0 else "+"
         label.setText(label_text)
 
+        # Diagnositic -- Display indices in the edit fields.
         # self.setText(str(row_index)+str(col_index))
 
-        # Add these in the order in which they should appear in window layout.
+        # Add these in the order in which they should appear in app.
         self.widgets.append(label)
         self.widgets.append(self)
         self.widgets.append(self.var_label)
@@ -252,7 +258,7 @@ class QLECon(QLESimplex):
 
         Parameters
         ---
-        new_name: string
+        new_name: str
         """
         self.var_label.setText(new_name)
 
@@ -268,42 +274,39 @@ class QLECon(QLESimplex):
 
 
 class QLEInq(QLESimplex):
-    """Child class of PyQt QLineEdit
+    """Child class of PyQt QLineEdit. Displayed on far right column of constraint input fields and objective function.
     """
     def __init__(self, window: QWidget, layout: QGridLayout, row_index: int, col_index: int):
         """Contains inequality label as well as QLineEdit field widget. Displayed on far right column
-        of constraint input fields.
+        of constraint input fields and objective function.
 
         Parameters:
         ---
         window: PyQt QWidget
         layout: PyQt QGridLayout
         row_index: int
-            1 should be added to this upon initialization to account for the objective function row.
-            Used for 
+            1 should be added to this upon initialization to account for the objective function row when creating
+            contraints. If 0, properties will change to allow the user to name the objective function.
         col_index: int
             The object column index. Determines the label text when object is in the first column.
         """
         QLESimplex.__init__(self, window, layout, row_index, col_index)
-        # Inequality label text will ultimately be determined by Minimize/Maximize button
+        # Inequality label text will ultimately be determined by Minimize/Maximize button.
         label_text = "≤"
-        # Change properties for objective function
+        # Change properties for objective function.
         if row_index == 0:
             label_text = "="
             self.setValidator(None)
             self.setText("Z")
             self.setMaxLength(3)
-            # Default objective function variable to "Z" if field is left blank
+            # Default objective function variable to "Z" if field is left blank.
             self.editingFinished.connect(lambda: self.setText("Z") if self.text().strip() == "" else self.text())
-            # self.setMaximumWidth(40)
 
         self.label = QLabel(window)
-        # self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.label.setAlignment(Qt.AlignLeft)
-        # self.label.setStyleSheet("QLabel {background-color: red;}")
         self.label.setText(label_text)
 
-        # Add these in the order in which they appear.
+        # Add these in the order in which they should appear in app.
         self.widgets.append(self.label)
         self.widgets.append(self)
         self.add()
@@ -316,3 +319,8 @@ class QLEInq(QLESimplex):
             The value of the edit field. Used to get name of objective function for solution table labeling.
         """
         return self.text()
+
+
+if __name__ == "__main__":
+    from simplex import SimplexCalculator
+    simplex = SimplexCalculator()
