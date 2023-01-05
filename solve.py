@@ -44,7 +44,7 @@ class SimplexSolve:
         """
         def is_negative(matrix_row) -> bool:
             """Tests weather there is a negative number in a list of floats/ints.
-            Stopping condition for simplex method
+            Stopping condition for simplex method.
             """
             for val in matrix_row:
                 if val < 0:
@@ -57,19 +57,20 @@ class SimplexSolve:
         # Continue until the bottom row is all positive.
         while is_negative(matrix[-1]):
             pivot_row, pivot_col, pivot = self.find_pivot(matrix)
-            # Divide pivot row by pivot value.
+            # Make pivot value 1 by dividing the pivot row by the pivot value.
             matrix[pivot_row] = [x/pivot for x in matrix[pivot_row]]
 
+            # Clear the pivot column, leaving only the pivot (now 1) and making the rest zeros:
             # Loop through each row -- excluding pivot row -- and add each component in the row by the
-            # corresponding componet of the pivot row multiplied by the value of the row's component 
+            # corresponding component of the pivot row multiplied by the value of the row's component
             # in the pivot column and flip sign of result.
-            # This will clear the pivot column, leaving only the pivot (now 1) and the rest zeros.
             for row_vector in matrix[:pivot_row]+matrix[pivot_row+1:]:
                 val = row_vector[pivot_col]
                 for i in range(len(row_vector)):
                     row_vector[i] += (-1)*matrix[pivot_row][i]*val
             # Save completed step.
             self.soln_matrices.append(matrix)
+            # Get copy of completed step.
             matrix = deepcopy(self.soln_matrices[-1])
 
             # print(str(Fraction(pivot).limit_denominator()))
@@ -85,7 +86,7 @@ class SimplexSolve:
 
         Returns
         ---
-        tuple
+        tuple: (pivot_row, pivot_col, pivot_val)
             A tuple of 3 values.
             The first two are integers corresponding to the privot row index and pivot column index, respectively.
             The last is the pivot value.
@@ -95,20 +96,20 @@ class SimplexSolve:
         # Divide each component of the last column with its row's pivot_col component. Exclude bottom row.
         # A None will be placed in the list for negatives or zeros in pivot column to be discounted in next step.
         divided_col = [x[-1] / x[pivot_col] if x[pivot_col] > 0 else None for x in matrix[:-1]]
-        # Get the index of the smallest value -- while discounting any nones in the list.
+        # Get the index of the smallest value -- while discounting any Nones in the list.
         pivot_row = divided_col.index(min([x for x in divided_col if x is not None]))
         return (pivot_row, pivot_col, matrix[pivot_row][pivot_col])
 
     def update_labels(self) -> None:
         """Update all labels in solution table to display current solution step.
-
-        https://stackoverflow.com/a/23344270
         """
         for row, matrix_row in enumerate(self.label_matrix):
             for col, label in enumerate(matrix_row):
                 val = self.soln_matrices[self.soln_index][row][col]
                 if float(val).is_integer():
                     label.setText(str(int(val)))
+                # If value is a float, display as a simplified fraction.
+                # https://stackoverflow.com/a/23344270
                 else:
                     fraction = Fraction(val).limit_denominator()
                     label.setText(str(fraction))
@@ -133,6 +134,18 @@ class SimplexSolve:
             self.soln_index -= 1
             self.update_labels()
 
+    def first_step(self) -> None:
+        """Skips to initial table.
+        """
+        self.soln_index = 0
+        self.update_labels()
+
+    def last_step(self) -> None:
+        """Skips to final iteration table.
+        """
+        self.soln_index = len(self.soln_matrices) - 1
+        self.update_labels()
+
     def create_matrices(self) -> None:
         """Turns a matrix of values from initial input objective function and constraint fields into the initial
         matrix used for applying simplex method and creates a corresponding matrix of label widgets as well as
@@ -146,12 +159,12 @@ class SimplexSolve:
         C2:  1X1 +  1X2\n
         Will result in the following matrix:\n
         [[1, 2, 40],\n
-        [1, 1, 30],\n
-        [12, 16, 0]]\n
+         [1, 1, 30],\n
+         [12, 16, 0]]\n
         And will be turned into:\n
         [[1, 2, 1, 0, 0, 40],\n
-        [1, 1, 0, 1, 0, 30],\n
-        [-12, -16, 0, 0, 1, 0]]
+         [1, 1, 0, 1, 0, 30],\n
+         [-12, -16, 0, 0, 1, 0]]
         """
         # Get matrix of setup value fields.
         val_matrix = self.simplex_setup.get_fields(not self.is_maximize)

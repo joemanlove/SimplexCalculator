@@ -4,7 +4,7 @@ Made with PyQt5
 """
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QSpacerItem, QSizePolicy,
-                             QGridLayout, QScrollArea, QFrame, QHBoxLayout)
+                             QGridLayout, QScrollArea, QFrame, QHBoxLayout, QVBoxLayout)
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import Qt, QRegExp
 
@@ -17,7 +17,7 @@ from styles import SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK
 class SimplexCalculator:
     """Main class for Simplex Calculator.
     Main PyQt window and app, as well as buttons and layouts are kept here.
-    Handles SimplexSetup and SimplexSolve objects -- setup fields handling and applying simplex method respectively.  
+    Handles SimplexSetup and SimplexSolve objects -- setup fields handling and applying simplex method respectively.
     """
     # Dimensions
     WINDOW_WIDTH = 480
@@ -140,21 +140,31 @@ class SimplexCalculator:
         self.dark_mode_button.clicked.connect(self.toggle_dark_mode)
         self.toggle_dark_mode()
 
-        # Previous solution button
-        prev_prev_button = QPushButton(self.window)
-        prev_prev_button.setText("<")
+        # First Solution Button
+        first_soln_button = QPushButton(self.window)
+        first_soln_button.setText("|<")
         # Lambdas are necessary because object does not yet exist
-        prev_prev_button.clicked.connect(lambda: self.simplex_solve.prev_step())
+        first_soln_button.clicked.connect(lambda: self.simplex_solve.first_step())
 
-        # Next soltion button
+        # Previous Solution Button
+        prev_soln_button = QPushButton(self.window)
+        prev_soln_button.setText("<")
+        prev_soln_button.clicked.connect(lambda: self.simplex_solve.prev_step())
+
+        # Next Solution Button
         next_soln_button = QPushButton(self.window)
         next_soln_button.setText(">")
         next_soln_button.clicked.connect(lambda: self.simplex_solve.next_step())
 
+        # Last Solution Button
+        last_soln_button = QPushButton(self.window)
+        last_soln_button.setText(">|")
+        last_soln_button.clicked.connect(lambda: self.simplex_solve.last_step())
+
 
         ### Layouts and Widget Placement
         # Primary layout for main window -- All child layouts are placed here.
-        parent_layout = QHBoxLayout()
+        parent_layout = QVBoxLayout()
         # parent_layout.setSpacing(0)
         parent_layout.setContentsMargins(0, 12, 0, 12)
 
@@ -168,25 +178,27 @@ class SimplexCalculator:
         constraints_layout = QGridLayout()
         constraints_layout.setVerticalSpacing(2)
         constraints_layout.setHorizontalSpacing(2)
+        constraints_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
         # The inequalities and associated values are placed here.
         # This is a separate layout because they are present on the far right regardless of how many variables there are.
         inequality_layout = QGridLayout()
         inequality_layout.setSpacing(2)
+        inequality_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
         # Scroll area layout -- Both constraints_layout and inequality_layout are placed here.
-        setup_fields_layout = QGridLayout()
+        setup_fields_layout = QHBoxLayout()
         setup_fields_layout.setSpacing(2)
         setup_fields_layout.setContentsMargins(4, 4, 4, 4)
+        setup_fields_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
 
         ### Solution Screen Layouts
         # Sublayouts for solution screen are placed here.
         soln_parent_layout = QGridLayout()
-        # Layout for displaying solution steps as labels.
+        # Layout for displaying solution steps as labels. This will be a scroll area.
         self.soln_table_layout = QGridLayout()
         self.soln_table_layout.setSpacing(0)
-        # Scroll area layout -- Separate layout is necessary for proper spacing purposes.
-        soln_table_parent_layout = QGridLayout()
+        self.soln_table_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
         # Button layout for cycling through solution steps.
-        soln_button_layout = QGridLayout()
+        soln_button_layout = QHBoxLayout()
 
         # Settings Layout
         settings_layout = QGridLayout()
@@ -211,21 +223,14 @@ class SimplexCalculator:
         setup_buttons_layout.addWidget(calculate_button,     4, 0, 1, 6)
 
         # Placement of objective function and constraint value fields.
-        setup_fields_layout.addItem(hori_spacer,          0, 0)
-        setup_fields_layout.addLayout(constraints_layout, 0, 1, Qt.AlignTop)
-        setup_fields_layout.addLayout(inequality_layout,  0, 2, Qt.AlignTop)
-        setup_fields_layout.addItem(hori_spacer,          0, 3)
-
-        # Horizontal spacers will force labels together regardless of how wide window is.
-        soln_table_parent_layout.addItem(hori_spacer,              0, 0)
-        soln_table_parent_layout.addLayout(self.soln_table_layout, 0, 1, Qt.AlignTop)
-        soln_table_parent_layout.addItem(hori_spacer,              0, 2)
+        setup_fields_layout.addLayout(constraints_layout)
+        setup_fields_layout.addLayout(inequality_layout)
 
         # These buttons will sit below solution step table.
-        soln_button_layout.addItem(hori_spacer,        0, 0)
-        soln_button_layout.addWidget(prev_prev_button, 0, 1)
-        soln_button_layout.addWidget(next_soln_button, 0, 2)
-        soln_button_layout.addItem(hori_spacer,        0, 3)
+        soln_button_layout.addWidget(first_soln_button)
+        soln_button_layout.addWidget(prev_soln_button)
+        soln_button_layout.addWidget(next_soln_button)
+        soln_button_layout.addWidget(last_soln_button)
 
         # Add scrollbar functionality to setup fields.
         # https://codeloop.org/pyqt5-gui-creating-qscrollarea/
@@ -239,7 +244,7 @@ class SimplexCalculator:
 
         # Add scrollbar functionality to solution table.
         soln_scroll_widget = QWidget()
-        soln_scroll_widget.setLayout(soln_table_parent_layout)
+        soln_scroll_widget.setLayout(self.soln_table_layout)
         soln_scroll_area = QScrollArea()
         soln_scroll_area.setWidget(soln_scroll_widget)
         soln_scroll_area.setWidgetResizable(True)
@@ -288,6 +293,7 @@ class SimplexCalculator:
         # Override window's keyPressEvent to do things upon keystrokes.
         self.window.keyPressEvent = self.key_pressed
         self.window.setLayout(parent_layout)
+        # Make go.
         self.window.show()
         self.app.exec()
 
