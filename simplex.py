@@ -6,7 +6,7 @@ Made with PyQt5
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QSpacerItem, QSizePolicy,
                              QGridLayout, QScrollArea, QFrame, QHBoxLayout, QVBoxLayout)
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtCore import Qt, QRegExp
+from PyQt5.QtCore import Qt, QRegExp, QPropertyAnimation, QEasingCurve, QRect
 
 from setup import SimplexSetup
 from solve import SimplexSolve
@@ -160,11 +160,12 @@ class SimplexCalculator:
         last_soln_button = QPushButton(self.window)
         last_soln_button.setText(">|")
         last_soln_button.clicked.connect(lambda: self.simplex_solve.last_step())
+        # last_soln_button.setDisabled(True)
 
 
         ### Layouts and Widget Placement
         # Primary layout for main window -- All child layouts are placed here.
-        parent_layout = QVBoxLayout()
+        parent_layout = QHBoxLayout()
         # parent_layout.setSpacing(0)
         parent_layout.setContentsMargins(0, 12, 0, 12)
 
@@ -393,9 +394,9 @@ class SimplexCalculator:
     def go_back(self) -> None:
         """Changes self.current_screen to self.previous_screen
         """
-        self.change_screens(self.previous_screen)
+        self.change_screens(self.previous_screen, True)
 
-    def change_screens(self, new_screen: QFrame) -> None:
+    def change_screens(self, new_screen: QFrame, is_going_back: bool = False) -> None:
         """Changes frame visibility to new QFrame.
 
         Parameters
@@ -403,15 +404,36 @@ class SimplexCalculator:
         new_screen: PyQt QFrame
             The frame to be shown.
             Expected frames are self.setup_screen, self.soln_screen, self.settings_screen
+        is_going_back: bool, optional
+            Defaulted False. Set to true if back button was pressed, making new screen enter from left
+            side, otherwise it will enter in from right.
         """
         self.current_screen.hide()
+        new_screen.show()
+
+        # Create animation to make new screen "slide" into view.
+        self.animation = QPropertyAnimation(new_screen, b"geometry")
+        self.animation.setDuration(200)
+        self.animation.setEasingCurve(QEasingCurve.InOutQuart)
+
+        # If back button was pressed, screen will appear to slide in from left.
+        if is_going_back:
+            self.animation.setStartValue(QRect(-self.window.width(), self.current_screen.y(),
+                self.window.width(), self.window.height()))
+            self.animation.setEndValue(self.current_screen.geometry())
+        # If back button was not pressed, screen will appear to slide in from right.
+        else:
+            self.animation.setStartValue(QRect(self.window.width(), self.current_screen.y(),
+                self.window.width(), self.window.height()))
+            self.animation.setEndValue(self.current_screen.geometry())
+        self.animation.start()
+
         # When changing from settings screen back to solutions screen, prevent back button from going back to settings.
         if self.current_screen == self.settings_screen and new_screen == self.soln_screen:
             self.previous_screen = self.setup_screen
         else:
             self.previous_screen = self.current_screen
         self.current_screen = new_screen
-        self.current_screen.show()
 
 
 if __name__ == "__main__":
