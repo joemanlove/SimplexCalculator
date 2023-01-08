@@ -3,14 +3,16 @@
 Made with PyQt5
 """
 
+import sys
+
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QSpacerItem, QSizePolicy,
                              QGridLayout, QScrollArea, QFrame, QHBoxLayout, QVBoxLayout)
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtCore import Qt, QRegExp, QPropertyAnimation, QEasingCurve, QRect
 
 from setup import SimplexSetup
 from solve import SimplexSolve
-from classes import QPBSimplex
+from classes import SPushButton, SCircleButton, SSettingsButton
 from styles import SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK
 
 
@@ -30,8 +32,10 @@ class SimplexCalculator:
     MAX_VARIABLES = 20
     MIN_CONSTRAINTS = 1
     MAX_CONSTRAINTS = 20
+
+    DEFUALT_FONT_SIZE = 15
     # Sets weather dark palette is on by default.
-    dark_mode = True
+    is_dark_mode = False
 
     def __init__(self):
         """
@@ -44,12 +48,17 @@ class SimplexCalculator:
         self.window.resize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.window.setMinimumSize(380, 480)
         self.window.setWindowTitle("Simplex Method")
+        # Used to swap between light and dark mode.
+        self.style_sheets = [SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK]
+        # All widgets with SIcons should be placed here for color swapping.
+        self.icon_buttons = []
+        self.font_style = (f"QWidget {{font-size: {self.DEFUALT_FONT_SIZE}px;}}")
 
         ### Setting Variables
         variables_label = QLabel(self.window)
         variables_label.setText("Set Variables")
         # Decrease Variables Button
-        variables_decrease = QPBSimplex(self.window, "-", self.WIDGET_WIDTH)
+        variables_decrease = SPushButton(self.window, "-", self.WIDGET_WIDTH)
         variables_decrease.clicked.connect(lambda: (
             self.QLE_inc_dec(variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES, False),
             self.simplex_setup.update()))
@@ -65,7 +74,7 @@ class SimplexCalculator:
             self.QLE_valid_range(variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES),
             self.simplex_setup.update()))
         # Increase Variables Button
-        variables_increase = QPBSimplex(self.window, "+", self.WIDGET_WIDTH)
+        variables_increase = SPushButton(self.window, "+", self.WIDGET_WIDTH)
         variables_increase.clicked.connect(lambda: (
             self.QLE_inc_dec(variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES),
             self.simplex_setup.update()))
@@ -74,7 +83,7 @@ class SimplexCalculator:
         constraints_label = QLabel(self.window)
         constraints_label.setText("Set Constraints")
         # Decrease Constraints Button
-        constraints_decrease = QPBSimplex(self.window, "-", self.WIDGET_WIDTH)
+        constraints_decrease = SPushButton(self.window, "-", self.WIDGET_WIDTH)
         constraints_decrease.clicked.connect(lambda: (
             self.QLE_inc_dec(constraints_edit, self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS, False),
             self.simplex_setup.update()))
@@ -89,7 +98,7 @@ class SimplexCalculator:
             self.QLE_valid_range(constraints_edit, self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS),
             self.simplex_setup.update()))
         # Increase Constraints Button
-        constraints_increase = QPBSimplex(self.window, "+", self.WIDGET_WIDTH)
+        constraints_increase = SPushButton(self.window, "+", self.WIDGET_WIDTH)
         constraints_increase.clicked.connect(lambda: (
             self.QLE_inc_dec(constraints_edit, self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS),
             self.simplex_setup.update()))
@@ -119,49 +128,74 @@ class SimplexCalculator:
 
         # Back Button -- Go back to the previous screen.
         # Duplicate buttons are necessary because the same widget cannot be in two different frames or layouts
-        back_button = QPushButton(self.window)
-        back_button.setText("Back")
+        back_button = SCircleButton(self.window)
+        back_button.set_icon("back.png")
         back_button.clicked.connect(self.go_back)
-        back_button2 = QPushButton(self.window)
-        back_button2.setText("Back")
+        self.icon_buttons.append(back_button)
+        back_button2 = SCircleButton(self.window)
+        back_button2.set_icon("back.png")
         back_button2.clicked.connect(self.go_back)
+        self.icon_buttons.append(back_button2)
 
         # Settings Button -- Open Settings screen.
-        settings_button = QPushButton(self.window)
-        settings_button.setText("Settings")
+        settings_button = SCircleButton(self.window)
+        settings_button.set_icon("settings.png")
         settings_button.clicked.connect(self.open_settings)
-        settings_button2 = QPushButton(self.window)
-        settings_button2.setText("Settings")
+        self.icon_buttons.append(settings_button)
+        settings_button2 = SCircleButton(self.window)
+        settings_button2.set_icon("settings.png")
         settings_button2.clicked.connect(self.open_settings)
+        self.icon_buttons.append(settings_button2)
 
-        # Toggle Dark Mode Button
-        self.dark_mode_button = QPushButton(self.window)
-        # self.dark_mode_button.setFixedWidth(300)
-        self.dark_mode_button.clicked.connect(self.toggle_dark_mode)
-        self.toggle_dark_mode()
-
-        # First Solution Button
-        first_soln_button = QPushButton(self.window)
-        first_soln_button.setText("|<")
+        ### Solution Screen Buttons
+        # First Solution Button -- Skip to initial step.
+        first_soln_button = SCircleButton(self.window)
+        first_soln_button.set_icon("first.png")
         # Lambdas are necessary because object does not yet exist
         first_soln_button.clicked.connect(lambda: self.simplex_solve.first_step())
+        self.icon_buttons.append(first_soln_button)
 
         # Previous Solution Button
-        prev_soln_button = QPushButton(self.window)
-        prev_soln_button.setText("<")
+        prev_soln_button = SCircleButton(self.window)
+        prev_soln_button.set_icon("previous.png")
         prev_soln_button.clicked.connect(lambda: self.simplex_solve.prev_step())
+        self.icon_buttons.append(prev_soln_button)
 
         # Next Solution Button
-        next_soln_button = QPushButton(self.window)
-        next_soln_button.setText(">")
+        next_soln_button = SCircleButton(self.window)
+        next_soln_button.set_icon("next.png")
         next_soln_button.clicked.connect(lambda: self.simplex_solve.next_step())
+        self.icon_buttons.append(next_soln_button)
 
         # Last Solution Button
-        last_soln_button = QPushButton(self.window)
-        last_soln_button.setText(">|")
+        last_soln_button = SCircleButton(self.window)
+        last_soln_button.set_icon("last.png")
         last_soln_button.clicked.connect(lambda: self.simplex_solve.last_step())
+        self.icon_buttons.append(last_soln_button)
         # last_soln_button.setDisabled(True)
 
+        ### Settings Screen Buttons
+        # Toggle Dark Mode Button
+        self.dark_mode_button = SSettingsButton(self.window, "Dark Mode")
+        self.dark_mode_button.set_setting_label()
+        self.dark_mode_button.clicked.connect(self.toggle_dark_mode)
+
+        # Change Font Size Button
+        font_size_button = SSettingsButton(self.window, "Font Size")
+        font_size_button.set_line_edit()
+        font_size_button.line_edit.setText(str(self.DEFUALT_FONT_SIZE))
+        # Limit range to 12 through 24
+        font_size_button.line_edit.editingFinished.connect(lambda: (
+            self.QLE_valid_range(font_size_button.line_edit, 12, 24),
+            self.change_font_size(int(font_size_button.line_edit.text()))))
+        # font_size_button.set_combo_box(["12", "14", "16", "18", "20", "22", "24"])
+        # self.icon_buttons.append(font_size_button)
+
+        # Opens GitHub repo.
+        github_button = SSettingsButton(self.window, "Visit Simplex Calculator on GitHub")
+        github_button.set_icon("github.png")
+        github_button.clicked.connect(lambda: print("Pressing Github Button. TODO: Replace this."))
+        self.icon_buttons.append(github_button)
 
         ### Layouts and Widget Placement
         # Primary layout for main window -- All child layouts are placed here.
@@ -203,11 +237,11 @@ class SimplexCalculator:
 
         # Settings Layout
         settings_layout = QGridLayout()
+        settings_layout.setAlignment(Qt.AlignTop)
 
         # Spacers to fill empty voids and force items in layouts into desired positions.
         hori_spacer = QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
         vert_spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        # print(dir(vert_spacer))
 
         # Placement of initial setup button -- constraint/variable labels, +/- buttons, and edit fields.
         setup_buttons_layout.addWidget(variables_label,      0, 0, 1, 3, Qt.AlignCenter)
@@ -261,9 +295,10 @@ class SimplexCalculator:
         soln_parent_layout.addWidget(soln_scroll_area,   1, 0, 1, 2)
         soln_parent_layout.addLayout(soln_button_layout, 2, 0, 1, 2, Qt.AlignCenter)
 
-        settings_layout.addWidget(back_button2,          0, 0, Qt.AlignLeft)
-        settings_layout.addWidget(self.dark_mode_button, 1, 0, Qt.AlignTop)
-        settings_layout.addItem(hori_spacer,             0, 1)
+        settings_layout.addWidget(back_button2,          0, 0)
+        settings_layout.addWidget(self.dark_mode_button, 1, 0)
+        settings_layout.addWidget(font_size_button,      2, 0)
+        settings_layout.addWidget(github_button,         3, 0)
 
         # Frames will contain primary layouts and be hidden/shown to simulate different "screens".
         self.setup_screen = QFrame()
@@ -286,6 +321,8 @@ class SimplexCalculator:
         self.current_screen = self.setup_screen
         self.previous_screen = self.setup_screen
 
+        # Apply current dark_mode settings to palette and icon buttons.
+        self.toggle_dark_mode()
         # Create object which destroys/creates all constraint and variable editing fields.
         self.simplex_setup = SimplexSetup(self.window, setup_fields_layout, variables_edit, constraints_edit)
         # Object which creates solution table when calculate_button is pressed.
@@ -296,7 +333,8 @@ class SimplexCalculator:
         self.window.setLayout(parent_layout)
         # Make go.
         self.window.show()
-        self.app.exec()
+        sys.exit(self.app.exec())
+        # self.app.exec()
 
     def QLE_valid_range(self, qle: QLineEdit, start: int, stop: int) -> None:
         """Limits the integer range of a QLineEdit widget.
@@ -339,18 +377,6 @@ class SimplexCalculator:
         elif not increment and value > start:
             qle.setText(str(value - 1))
 
-    def toggle_dark_mode(self) -> None:
-        """Toggles between light and dark modes when self.dark_mode_button is pressed.
-        """
-        # TODO: Change to make in terms of dark mode on/off.
-        if self.dark_mode:
-            self.dark_mode_button.setText("Dark Mode")
-            self.window.setStyleSheet(SIMPLEX_STYLE_DARK)
-        else:
-            self.dark_mode_button.setText("Light Mode")
-            self.window.setStyleSheet(SIMPLEX_STYLE_LIGHT)
-        self.dark_mode = not self.dark_mode
-
     def toggle_max_min(self) -> None:
         """Toggles between maximize/minimize when self.max_min_button is pressed,
         changing inequality labels and dictating simplex calulation approach.
@@ -358,23 +384,13 @@ class SimplexCalculator:
         if self.is_maximize:
             self.max_min_button.setText("Minimize")
             # Index slice to exclude first element as that is the objective function's "=".
-            for i in range(len(self.simplex_setup.QLEInqs))[1:]:
-                self.simplex_setup.QLEInqs[i].label.setText("≥")
+            for i in range(len(self.simplex_setup.SLEIneqs))[1:]:
+                self.simplex_setup.SLEIneqs[i].label.setText("≥")
         else:
             self.max_min_button.setText("Maximize")
-            for i in range(len(self.simplex_setup.QLEInqs))[1:]:
-                self.simplex_setup.QLEInqs[i].label.setText("≤")
+            for i in range(len(self.simplex_setup.SLEIneqs))[1:]:
+                self.simplex_setup.SLEIneqs[i].label.setText("≤")
         self.is_maximize = not self.is_maximize
-
-    def key_pressed(self, event):
-        """Override function for main window.
-
-        Closes application when escape key is pressed.
-        https://stackoverflow.com/a/36556695
-        """
-        if event.key() == Qt.Key_Escape:
-            self.window.close()
-            self.app.quit()
 
     def calculate(self) -> None:
         """Create's SimplexSolve object, deletes old one if it exists, and displays solution frame.
@@ -396,6 +412,33 @@ class SimplexCalculator:
         """
         self.change_screens(self.previous_screen, True)
 
+    def toggle_dark_mode(self) -> None:
+        """Toggles between dark mode on/off when self.dark_mode_button is pressed.
+        """
+        # is_dark_mode will act as an index for selecting style sheet from self.style_sheets.
+        self.is_dark_mode = not self.is_dark_mode
+        off_on = ["Off", "On"]
+        self.dark_mode_button.setText(off_on[self.is_dark_mode])
+        # Preserve current font size.
+        self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
+        # Change all icon colors.
+        for button in self.icon_buttons:
+            # print(button.icon)
+            button.icon.color_swap(self.is_dark_mode)
+
+    def change_font_size(self, font_size: int) -> None:
+        """Changes font size via global style sheet  limited user input.
+
+        Connected to font_size_button.
+
+        Parameters
+        ---
+        font_size: int
+        """
+        # Updates self.font_style, concatenates it with the current dark/light mode style sheet, and sets it.
+        self.font_style = (f"QWidget {{font-size: {font_size}px;}}")
+        self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
+
     def change_screens(self, new_screen: QFrame, is_going_back: bool = False) -> None:
         """Changes frame visibility to new QFrame.
 
@@ -408,10 +451,22 @@ class SimplexCalculator:
             Defaulted False. Set to true if back button was pressed, making new screen enter from left
             side, otherwise it will enter in from right.
         """
+        # Disable old screen to prevent selection of last button pressed (on old screen) with spacebar.
+        self.current_screen.setDisabled(True)
         self.current_screen.hide()
+        new_screen.setDisabled(False)
         new_screen.show()
+        self.current_screen.hide()
+
+        # When changing from settings screen back to solutions screen, prevent back button from going back to settings.
+        if self.current_screen == self.settings_screen and new_screen == self.soln_screen:
+            self.previous_screen = self.setup_screen
+        else:
+            self.previous_screen = self.current_screen
+        self.current_screen = new_screen
 
         # Create animation to make new screen "slide" into view.
+        # https://forum.qt.io/topic/3709/simple-animation-not-working/3
         self.animation = QPropertyAnimation(new_screen, b"geometry")
         self.animation.setDuration(200)
         self.animation.setEasingCurve(QEasingCurve.InOutQuart)
@@ -428,12 +483,15 @@ class SimplexCalculator:
             self.animation.setEndValue(self.current_screen.geometry())
         self.animation.start()
 
-        # When changing from settings screen back to solutions screen, prevent back button from going back to settings.
-        if self.current_screen == self.settings_screen and new_screen == self.soln_screen:
-            self.previous_screen = self.setup_screen
-        else:
-            self.previous_screen = self.current_screen
-        self.current_screen = new_screen
+    def key_pressed(self, event):
+        """Override function for main window.
+
+        Closes application when escape key is pressed.
+        https://stackoverflow.com/a/36556695
+        """
+        if event.key() == Qt.Key_Escape:
+            self.window.close()
+            self.app.quit()
 
 
 if __name__ == "__main__":

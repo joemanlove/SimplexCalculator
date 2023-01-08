@@ -2,11 +2,12 @@
 and generates/destroys corresponding labels.
 """
 
-from PyQt5.QtWidgets import QWidget, QGridLayout
 from copy import deepcopy
 from fractions import Fraction
+from PyQt5.QtWidgets import QWidget, QGridLayout
 
-from classes import QLabelSimplex
+from classes import SLabelSolve
+
 
 class SimplexSolve:
     """Generates and displays all solution steps.
@@ -34,10 +35,6 @@ class SimplexSolve:
         self.label_matrix = []
         self.create_matrices()
         self.solve()
-        # for i, matrix in enumerate(self.soln_matrices):
-        #     print(f"Step: {i + 1}")
-        #     for row in matrix:
-        #         print(row)
 
     def solve(self) -> None:
         """Applies the simplex method.
@@ -64,10 +61,10 @@ class SimplexSolve:
             # Loop through each row -- excluding pivot row -- and add each component in the row by the
             # corresponding component of the pivot row multiplied by the value of the row's component
             # in the pivot column and flip sign of result.
-            for row_vector in matrix[:pivot_row]+matrix[pivot_row+1:]:
+            for row_vector in matrix[:pivot_row] + matrix[pivot_row + 1:]:
                 val = row_vector[pivot_col]
                 for i in range(len(row_vector)):
-                    row_vector[i] += (-1)*matrix[pivot_row][i]*val
+                    row_vector[i] += (-1)*val*matrix[pivot_row][i]
             # Save completed step.
             self.soln_matrices.append(matrix)
             # Get copy of completed step.
@@ -186,13 +183,15 @@ class SimplexSolve:
 
         # Create header name labels on first row (e.g. X1, X2, S1, S2, Z).
         # Get a list of the objective terms, one column of constraint terms, and the objective function name.
-        widget_list = self.simplex_setup.QLEVars+self.simplex_setup.QLEVars[0].constraint_col+[self.simplex_setup.QLEInqs[0]]
+        widget_list = self.simplex_setup.SLEVars+self.simplex_setup.SLEVars[0].constraint_col+[self.simplex_setup.SLEIneqs[0]]
         for col, widget in enumerate(widget_list):
             # Give each label in the header row a bottom border to create a line.
-            label = QLabelSimplex(self.window, self.layout, widget.get_name(), 0, col, ["bottom"])
+            label = SLabelSolve(self.window, widget.get_name(), ["bottom"])
+            self.layout.addWidget(label, 0, col)
             self.header_labels.append(label)
         # Add a blank label with borders to complete lines in table.
-        label = QLabelSimplex(self.window, self.layout, "", 0, col + 1, ["bottom", "left"])
+        label = SLabelSolve(self.window, "", ["bottom", "left"])
+        self.layout.addWidget(label, 0, col + 1)
         self.header_labels.append(label)
 
         # Create label matrix from solution matrix -- labels of constraint and objective function values.
@@ -207,8 +206,10 @@ class SimplexSolve:
                 # Last row gets a top border.
                 if row + 1 == len(soln_matrix):
                     borders.append("top")
+                label = SLabelSolve(self.window, str(val), borders)
                 # Add 1 to row to account for header labels.
-                self.label_matrix[row].append(QLabelSimplex(self.window, self.layout, str(val), row + 1, col, borders))
+                self.layout.addWidget(label, row + 1, col)
+                self.label_matrix[row].append(label)
 
     def delete(self) -> None:
         """Removes all labels from the soltion table's layout.
