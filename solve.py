@@ -59,7 +59,6 @@ class SimplexSolve:
             # Make pivot value 1 by dividing the pivot row by the pivot value.
             matrix[pivot_row] = [x/pivot for x in matrix[pivot_row]]
 
-            # TODO: Rephrase these comments to make more clear.
             # Clear the pivot column, leaving only the pivot (now 1) and making the rest zeros:
             # Loop through each row -- excluding pivot row -- and add each component in the row by the
             # corresponding component of the pivot row multiplied by the value of the row's component
@@ -72,9 +71,6 @@ class SimplexSolve:
             self.soln_matrices.append(matrix)
             # Get copy of completed step.
             matrix = deepcopy(self.soln_matrices[-1])
-
-            # print(str(Fraction(pivot).limit_denominator()))
-            # [print([str(Fraction(x).limit_denominator()) for x in row]) for row in matrix]
 
     def find_pivot(self, matrix: list) -> tuple:
         """Find the current pivot and return its matrix indices and value.

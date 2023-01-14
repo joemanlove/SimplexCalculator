@@ -148,15 +148,6 @@ class SimplexSetup:
 
             If there is no entry, default to 0.
             """
-            # if is_floats:
-            #     if widget.text():
-            #         component = float(widget.text())
-            #     else:
-            #         component = 0.0
-            #         widget.setText("0")
-            # else:
-            #     component = widget
-            # return component
             return (float(widget.text()) if widget.text() else 0.0) if is_floats else widget
 
         # It is more convenient to construct the transpose first with current structure.

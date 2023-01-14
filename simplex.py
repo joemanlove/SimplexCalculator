@@ -6,8 +6,8 @@ Made with PyQt5
 import sys
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QSpacerItem, QSizePolicy,
-                             QGridLayout, QScrollArea, QFrame, QHBoxLayout, QVBoxLayout)
-from PyQt5.QtGui import QRegExpValidator, QFont
+                             QFrame, QGridLayout, QScrollArea, QHBoxLayout, QVBoxLayout)
+from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import Qt, QRegExp, QPropertyAnimation, QEasingCurve, QRect
 
 from setup import SimplexSetup
@@ -170,7 +170,6 @@ class SimplexCalculator:
         next_soln_button.set_icon("next.png")
         next_soln_button.clicked.connect(lambda: self.simplex_solve.next_step())
         self.icon_buttons.append(next_soln_button)
-        # next_soln_button.setDisabled(True)
 
         # Last Solution Button
         last_soln_button = SCircleButton(self.window)
@@ -206,7 +205,6 @@ class SimplexCalculator:
         ### Layouts and Widget Placement
         # Primary layout for main window -- All child layouts are placed here.
         parent_layout = QHBoxLayout()
-        # parent_layout.setSpacing(0)
         parent_layout.setContentsMargins(0, 12, 0, 12)
 
         ### Setup Screen Layouts
@@ -244,10 +242,6 @@ class SimplexCalculator:
         # Settings Layout
         settings_layout = QGridLayout()
         settings_layout.setAlignment(Qt.AlignTop)
-
-        # Spacers to fill empty voids and force items in layouts into desired positions.
-        hori_spacer = QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        vert_spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         # Placement of initial setup button -- constraint/variable labels, +/- buttons, and edit fields.
         setup_buttons_layout.addWidget(variables_label,      0, 0, 1, 3, Qt.AlignCenter)
@@ -342,7 +336,6 @@ class SimplexCalculator:
         self.window.setLayout(parent_layout)
         self.window.show()
         sys.exit(self.app.exec())
-        # self.app.exec()
 
     def QLE_valid_range(self, qle: QLineEdit, start: int, stop: int) -> None:
         """Limits the integer range of a QLineEdit widget.
@@ -407,7 +400,8 @@ class SimplexCalculator:
         if self.simplex_solve is not None:
             self.simplex_solve.delete()
         self.change_screens(self.soln_screen)
-        self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup, self.soln_step_label, self.is_maximize)
+        self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup,
+                                self.soln_step_label, self.is_maximize)
 
     def open_settings(self) -> None:
         """Open settings menu.
@@ -431,7 +425,6 @@ class SimplexCalculator:
         self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
         # Change all icon colors.
         for button in self.icon_buttons:
-            # print(button.icon)
             button.icon.color_swap(self.is_dark_mode)
 
     def change_font_size(self, font_size: int) -> None:
@@ -446,13 +439,6 @@ class SimplexCalculator:
         # Updates self.font_style, concatenates it with the current dark/light mode style sheet, and sets it.
         self.font_style = (f"QWidget {{font-size: {font_size}px;}}")
         self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
-
-    def open_github(self) -> None:
-        """Opens github repo in default browser.
-
-        https://github.com/nonetypes/SimplexCalculator
-        """
-        pass
 
     def change_screens(self, new_screen: QFrame, is_going_back: bool = False) -> None:
         """Changes frame visibility to new QFrame.
@@ -471,7 +457,6 @@ class SimplexCalculator:
         self.current_screen.hide()
         new_screen.setDisabled(False)
         new_screen.show()
-        self.current_screen.hide()
 
         # When changing from settings screen back to solutions screen, prevent back button from going back to settings.
         if self.current_screen == self.settings_screen and new_screen == self.soln_screen:
