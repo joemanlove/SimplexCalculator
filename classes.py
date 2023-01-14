@@ -23,14 +23,6 @@ class SCircleButton(QToolButton):
 
     https://stackoverflow.com/a/48291001
     """
-    def __init__(self, window: QWidget):
-        """Child class of PyQt QToolButton. Forces button selection to be a circle.
-
-        Parameters
-        ---
-        window: PyQt QWidget
-        """
-        super().__init__(window)
 
     def resizeEvent(self, event) -> None:
         """Force button selection area to be a circle.
@@ -163,6 +155,9 @@ class SSettingsButton(QToolButton):
         self.line_edit.setAlignment(Qt.AlignCenter)
         # Limit field input to digits -- Allow empty strings to enable user to clear field.
         self.line_edit.setValidator(QRegExpValidator(QRegExp('(^[0-9]+$|^$)')))
+        self.vert_layout.addWidget(self.line_edit)
+        # self.layout().addWidget(self.line_edit)
+
         def focus_out(event):
             # self.line_edit.clearFocus()
             self.clearFocus()
@@ -175,15 +170,12 @@ class SSettingsButton(QToolButton):
             self.line_edit.setFocus()
             self.line_edit.selectAll()
 
-        # self.mouseReleaseEvent = lambda event: (self.line_edit.setFocus(), self.line_edit.selectAll())
         self.mouseReleaseEvent = mouse_release
         # self.focusOutEvent = focus_out
         # If space bar is pressed, engage widget.
         # self.keyPressEvent = lambda event: self.line_edit.setFocus() if event.key() == Qt.Key_Space else None
         # self.line_edit.setFocusPolicy(Qt.NoFocus)
 
-        self.vert_layout.addWidget(self.line_edit)
-        # self.layout().addWidget(self.line_edit)
         
 
     def set_combo_box(self, items: list):
@@ -279,6 +271,9 @@ class SLabelSolve(QLabel):
             Expected strings are "top", "bottom", "left", or "right".
         """
         QLabel.__init__(self, window)
+        self.setText(text)
+        self.setAlignment(Qt.AlignCenter)
+
         # Create border
         # Below string will be divided into substrings, if a direction within borders is present,
         # the substring is replaced with an empty string.
@@ -291,8 +286,6 @@ class SLabelSolve(QLabel):
                     break
         style = " ".join(style_list)
         self.setStyleSheet(style)
-        self.setText(text)
-        self.setAlignment(Qt.AlignCenter)
 
 
 class SLineEdit(QLineEdit):
@@ -387,6 +380,7 @@ class SLEVar(SLineEdit):
         # Extra spaces are added to align with "Constraint #"
         # label_text = "Objective: " if col_index == 0 else "+"
         # TODO: Default value should either reflect objective function name input or be more descriptive.
+        # The first component displays objective function name instead of "+".
         label_text = "Z:" if col_index == 0 else "+"
 
         label.setText(label_text)

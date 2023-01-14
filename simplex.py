@@ -6,7 +6,7 @@ Made with PyQt5
 import sys
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QSpacerItem, QSizePolicy,
-                             QGridLayout, QScrollArea, QFrame, QHBoxLayout, QVBoxLayout)
+                             QFrame, QGridLayout, QScrollArea, QHBoxLayout, QVBoxLayout)
 from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtCore import Qt, QRegExp, QPropertyAnimation, QEasingCurve, QRect
 
@@ -127,7 +127,7 @@ class SimplexCalculator:
         calculate_button.clicked.connect(self.calculate)
 
         # Back Button -- Go back to the previous screen.
-        # Duplicate buttons are necessary because the same widget cannot be in two different frames or layouts
+        # Duplicate buttons are necessary because the same widget cannot be in two different frames or layouts.
         back_button = SCircleButton(self.window)
         back_button.set_icon("back.png")
         back_button.clicked.connect(self.go_back)
@@ -170,14 +170,12 @@ class SimplexCalculator:
         next_soln_button.set_icon("next.png")
         next_soln_button.clicked.connect(lambda: self.simplex_solve.next_step())
         self.icon_buttons.append(next_soln_button)
-        # next_soln_button.setDisabled(True)
 
         # Last Solution Button
         last_soln_button = SCircleButton(self.window)
         last_soln_button.set_icon("last.png")
         last_soln_button.clicked.connect(lambda: self.simplex_solve.last_step())
         self.icon_buttons.append(last_soln_button)
-        # last_soln_button.setDisabled(True)
 
         ### Settings Screen Buttons
         # Toggle Dark Mode Button
@@ -342,7 +340,6 @@ class SimplexCalculator:
         self.window.setLayout(parent_layout)
         self.window.show()
         sys.exit(self.app.exec())
-        # self.app.exec()
 
     def QLE_valid_range(self, qle: QLineEdit, start: int, stop: int) -> None:
         """Limits the integer range of a QLineEdit widget.
@@ -431,7 +428,6 @@ class SimplexCalculator:
         self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
         # Change all icon colors.
         for button in self.icon_buttons:
-            # print(button.icon)
             button.icon.color_swap(self.is_dark_mode)
 
     def change_font_size(self, font_size: int) -> None:
@@ -471,7 +467,6 @@ class SimplexCalculator:
         self.current_screen.hide()
         new_screen.setDisabled(False)
         new_screen.show()
-        self.current_screen.hide()
 
         # When changing from settings screen back to solutions screen, prevent back button from going back to settings.
         if self.current_screen == self.settings_screen and new_screen == self.soln_screen:

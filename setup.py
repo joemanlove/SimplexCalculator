@@ -3,6 +3,7 @@ depending on constraint and variable numbers set by user.
 """
 
 from random import randint, choice
+
 from PyQt5.QtWidgets import QWidget, QLineEdit, QGridLayout
 
 from classes import SLEVar, SLECon, SLEIneq
@@ -180,7 +181,7 @@ class SimplexSetup:
         component = 0.0 if is_floats else self.SLEIneqs[0]
         matrix[-1].append(component)
 
-        # Since matrix is currenlty the transpose, transpose it to get not the transpose.
+        # Since matrix is currenlty the transpose, transpose it to get original matrix.
         if not transpose:
             # https://stackoverflow.com/a/4937526
             matrix = list(map(list, zip(*matrix)))

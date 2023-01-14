@@ -4,6 +4,7 @@ and generates/destroys corresponding labels.
 
 from copy import deepcopy
 from fractions import Fraction
+
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
 from classes import SLabelSolve
