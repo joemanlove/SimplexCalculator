@@ -21,6 +21,8 @@ class SimplexSolve:
         layout: PyQt QGridLayout
             soln_table_layout where labels are added.
         simplex_setup: SimplexSetup
+        soln_step_label: PyQt QLabel
+            The label which displays the current step number of the total solution steps.
         is_maximize: bool
             Determines whether problem is maximization or minimization and dictates certain solution steps and labels.
             Set with maximize/minimize button on setup screen.
@@ -42,7 +44,7 @@ class SimplexSolve:
     def solve(self) -> None:
         """Applies the simplex method.
         """
-        def is_negative(matrix_row) -> bool:
+        def has_negative(matrix_row) -> bool:
             """Tests weather there is a negative number in a list of floats/ints.
             Stopping condition for simplex method.
             """
@@ -55,20 +57,19 @@ class SimplexSolve:
         matrix = deepcopy(self.soln_matrices[-1])
 
         # Continue until the bottom row is all positive.
-        while is_negative(matrix[-1]):
+        while has_negative(matrix[-1]):
             pivot_row, pivot_col, pivot = self.find_pivot(matrix)
             # Make pivot value 1 by dividing the pivot row by the pivot value.
             matrix[pivot_row] = [x/pivot for x in matrix[pivot_row]]
 
-            # TODO: Rephrase these comments to make more clear.
             # Clear the pivot column, leaving only the pivot (now 1) and making the rest zeros:
-            # Loop through each row -- excluding pivot row -- and add each component in the row by the
-            # corresponding component of the pivot row multiplied by the value of the row's component
-            # in the pivot column and flip sign of result.
+            # Loop through each row -- excluding pivot row -- and subtract each component in the row by the
+            # the scalar, which will make the pivot column component zero, multiplied by the
+            # corresponding component in the pivot row.
             for row_vector in matrix[:pivot_row] + matrix[pivot_row + 1:]:
-                val = row_vector[pivot_col]
+                scalar = row_vector[pivot_col]
                 for i in range(len(row_vector)):
-                    row_vector[i] += (-1)*val*matrix[pivot_row][i]
+                    row_vector[i] -= scalar*matrix[pivot_row][i]
             # Save completed step.
             self.soln_matrices.append(matrix)
             # Get copy of completed step.

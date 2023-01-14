@@ -9,7 +9,7 @@ SLEIneq: QLineEdit child
 from os import path
 
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QComboBox,
-                            QToolButton, QSizePolicy, QHBoxLayout, QVBoxLayout)
+                             QToolButton, QSizePolicy, QHBoxLayout, QVBoxLayout)
 from PyQt5.QtGui import QRegExpValidator, QRegion, QPixmap, QColor, QIcon, QPixmap
 from PyQt5.QtCore import Qt, QRegExp
 
@@ -174,9 +174,7 @@ class SSettingsButton(QToolButton):
         # self.focusOutEvent = focus_out
         # If space bar is pressed, engage widget.
         # self.keyPressEvent = lambda event: self.line_edit.setFocus() if event.key() == Qt.Key_Space else None
-        # self.line_edit.setFocusPolicy(Qt.NoFocus)
-
-        
+        # self.line_edit.setFocusPolicy(Qt.NoFocus)        
 
     def set_combo_box(self, items: list):
         """Creates a QComboBox -- or drop down menu.
