@@ -155,22 +155,36 @@ class SSettingsButton(QToolButton):
 
         Used for font size and decimal places setting.
         """
+        # TODO: Cleanup
         self.line_edit = QLineEdit()
         self.line_edit.setMaxLength(2)
         self.line_edit.setMaximumWidth(40)
-        self.line_edit.setAlignment(Qt.AlignCenter)
         # self.line_edit.setMaximumHeight(40)
+        self.line_edit.setAlignment(Qt.AlignCenter)
         # Limit field input to digits -- Allow empty strings to enable user to clear field.
         self.line_edit.setValidator(QRegExpValidator(QRegExp('(^[0-9]+$|^$)')))
+        def focus_out(event):
+            # self.line_edit.clearFocus()
+            self.clearFocus()
+            # self.line_edit.nextInFocusChain()
+            self.setDown(False)
+        
         # Force clicking on entire setting button to engage widget.
-        self.mouseReleaseEvent = lambda event: self.line_edit.setFocus()
-        # self.focusInEvent = lambda event: self.line_edit.setFocus()
-        # self.focusOutEvent = None
+        def mouse_release(event):
+            self.setDown(False)
+            self.line_edit.setFocus()
+            self.line_edit.selectAll()
+
+        # self.mouseReleaseEvent = lambda event: (self.line_edit.setFocus(), self.line_edit.selectAll())
+        self.mouseReleaseEvent = mouse_release
+        # self.focusOutEvent = focus_out
         # If space bar is pressed, engage widget.
         # self.keyPressEvent = lambda event: self.line_edit.setFocus() if event.key() == Qt.Key_Space else None
         # self.line_edit.setFocusPolicy(Qt.NoFocus)
+
         self.vert_layout.addWidget(self.line_edit)
         # self.layout().addWidget(self.line_edit)
+        
 
     def set_combo_box(self, items: list):
         """Creates a QComboBox -- or drop down menu.
@@ -194,6 +208,58 @@ class SLabelSetting(QLabel):
     """
     def __init__(self, window: QWidget = None):
         super().__init__(window)
+
+
+class SIcon(QIcon):
+    """Child class of PyQt QIcon. Allows color swapping between light and dark mode.
+
+    Sourced icons must be solid white in color to properly create color masks.
+    """
+    def __init__(self, parent, icon_name: str):
+        """
+        Parameters
+        ---
+        parent: PyQt object
+            The parent widget must be one that has a setIcon method, e.g. QPushButton, QToolButton etc.
+        icon_name: str
+            The file name of the icon with extension. Icons shuold be placed in /assets and
+            the directory path should be excluded from the name.
+        """
+        super().__init__()
+        self.parent = parent
+        # Color at index 0 and 1 are light mode color and dark mode color respectively.
+        self.colors = [SIMPLEX_ICON_LIGHT, SIMPLEX_ICON_DARK]
+        self.current_color = self.colors[0]
+
+        # Change color of icon using a pixel map and a mask.
+        # https://stackoverflow.com/a/38369468
+        # Icon must be solid white to start with.
+        self.pixmap = QPixmap(path.join(path.dirname(__file__), f"assets/{icon_name}"))
+        mask = self.pixmap.createMaskFromColor(QColor('#FFFFFF'), Qt.MaskOutColor)
+        self.pixmap.fill((QColor(self.current_color)))
+        self.pixmap.setMask(mask)
+        self.addPixmap(self.pixmap)
+
+        self.parent.setIcon(self)
+        # Give parent own's color_swap method.
+        self.parent.color_swap = self.color_swap
+
+    def color_swap(self, is_dark_mode: bool) -> None:
+        """Swap icon color between dark mode color scheme and light mode color scheme.
+
+        Parameters
+        ---
+        is_dark_mode: bool
+            The current dark mode state. Used as an index to select color from self.colors.
+        """
+        new_color = self.colors[is_dark_mode]
+        mask = self.pixmap.createMaskFromColor(QColor(self.current_color), Qt.MaskOutColor)
+        self.pixmap.fill((QColor(new_color)))
+        self.pixmap.setMask(mask)
+        self.addPixmap(self.pixmap)
+        # Parent's icon must be reset.
+        self.parent.setIcon(self)
+        self.current_color = new_color
 
 
 class SLabelSolve(QLabel):
@@ -472,58 +538,6 @@ class SLEIneq(SLineEdit):
             The value of the edit field. Used to get name of objective function for solution table labeling.
         """
         return self.text()
-
-
-class SIcon(QIcon):
-    """Child class of PyQt QIcon. Allows color swapping between light and dark mode.
-
-    Sourced icons must be solid white in color to properly create color masks.
-    """
-    def __init__(self, parent, icon_name: str):
-        """
-        Parameters
-        ---
-        parent: PyQt object
-            The parent widget must be one that has a setIcon method, e.g. QPushButton, QToolButton etc.
-        icon_name: str
-            The file name of the icon with extension. Icons shuold be placed in /assets and
-            the directory path should be excluded from the name.
-        """
-        super().__init__()
-        self.parent = parent
-        # Color at index 0 and 1 are light mode color and dark mode color respectively.
-        self.colors = [SIMPLEX_ICON_LIGHT, SIMPLEX_ICON_DARK]
-        self.current_color = self.colors[0]
-
-        # Change color of icon using a pixel map and a mask.
-        # https://stackoverflow.com/a/38369468
-        # Icon must be solid white to start with.
-        self.pixmap = QPixmap(path.join(path.dirname(__file__), f"assets/{icon_name}"))
-        mask = self.pixmap.createMaskFromColor(QColor('#FFFFFF'), Qt.MaskOutColor)
-        self.pixmap.fill((QColor(self.current_color)))
-        self.pixmap.setMask(mask)
-        self.addPixmap(self.pixmap)
-
-        self.parent.setIcon(self)
-        # Give parent own's color_swap method.
-        self.parent.color_swap = self.color_swap
-
-    def color_swap(self, is_dark_mode: bool) -> None:
-        """Swap icon color between dark mode color scheme and light mode color scheme.
-
-        Parameters
-        ---
-        is_dark_mode: bool
-            The current dark mode state. Used as an index to select color from self.colors.
-        """
-        new_color = self.colors[is_dark_mode]
-        mask = self.pixmap.createMaskFromColor(QColor(self.current_color), Qt.MaskOutColor)
-        self.pixmap.fill((QColor(new_color)))
-        self.pixmap.setMask(mask)
-        self.addPixmap(self.pixmap)
-        # Parent's icon must be reset.
-        self.parent.setIcon(self)
-        self.current_color = new_color
 
 
 if __name__ == "__main__":

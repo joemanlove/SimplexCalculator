@@ -4,7 +4,7 @@ and generates/destroys corresponding labels.
 
 from copy import deepcopy
 from fractions import Fraction
-from PyQt5.QtWidgets import QWidget, QGridLayout
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
 from classes import SLabelSolve
 
@@ -12,7 +12,7 @@ from classes import SLabelSolve
 class SimplexSolve:
     """Generates and displays all solution steps.
     """
-    def __init__(self, window: QWidget, layout: QGridLayout, simplex_setup, is_maximize: bool):
+    def __init__(self, window: QWidget, layout: QGridLayout, simplex_setup, soln_step_label: QLabel, is_maximize: bool):
         """
         Parameters
         ---
@@ -27,6 +27,7 @@ class SimplexSolve:
         self.window = window
         self.layout = layout
         self.simplex_setup = simplex_setup
+        self.soln_step_label = soln_step_label
         self.is_maximize = is_maximize
         self.soln_index = 0
         self.soln_matrices = []
@@ -35,6 +36,7 @@ class SimplexSolve:
         self.label_matrix = []
         self.create_matrices()
         self.solve()
+        self.update_labels()
 
     def solve(self) -> None:
         """Applies the simplex method.
@@ -57,6 +59,7 @@ class SimplexSolve:
             # Make pivot value 1 by dividing the pivot row by the pivot value.
             matrix[pivot_row] = [x/pivot for x in matrix[pivot_row]]
 
+            # TODO: Rephrase these comments to make more clear.
             # Clear the pivot column, leaving only the pivot (now 1) and making the rest zeros:
             # Loop through each row -- excluding pivot row -- and add each component in the row by the
             # corresponding component of the pivot row multiplied by the value of the row's component
@@ -93,12 +96,15 @@ class SimplexSolve:
         # Divide each component of the last column with its row's pivot_col component. Exclude bottom row.
         # A None will be placed in the list for negatives or zeros in pivot column to be discounted in next step.
         divided_col = [x[-1] / x[pivot_col] if x[pivot_col] > 0 else None for x in matrix[:-1]]
-        # Get the index of the smallest value -- while discounting any Nones in the list.
+        # Get the index of the smallest value -- while discounting any Nones in the list.)
         pivot_row = divided_col.index(min([x for x in divided_col if x is not None]))
         return (pivot_row, pivot_col, matrix[pivot_row][pivot_col])
 
     def update_labels(self) -> None:
         """Update all labels in solution table to display current solution step.
+
+        Update the solution step label which displays the current soltion step number out of
+        the total steps, e.g. 1/3, 2/3 etc.
         """
         for row, matrix_row in enumerate(self.label_matrix):
             for col, label in enumerate(matrix_row):
@@ -110,6 +116,9 @@ class SimplexSolve:
                 else:
                     fraction = Fraction(val).limit_denominator()
                     label.setText(str(fraction))
+        
+        # Update solution step number.
+        self.soln_step_label.setText(f"{self.soln_index + 1} / {len(self.soln_matrices)}")
 
     def next_step(self) -> None:
         """Increments index of soln_matrices by 1 and updates labels.
@@ -181,9 +190,16 @@ class SimplexSolve:
                 soln_matrix[row].insert(-1, val)
         self.soln_matrices.append(soln_matrix)
 
-        # Create header name labels on first row (e.g. X1, X2, S1, S2, Z).
+        # Create header name labels on first row.
         # Get a list of the objective terms, one column of constraint terms, and the objective function name.
-        widget_list = self.simplex_setup.SLEVars+self.simplex_setup.SLEVars[0].constraint_col+[self.simplex_setup.SLEIneqs[0]]
+        if self.is_maximize:
+            widget_list = (self.simplex_setup.SLEVars + self.simplex_setup.SLEVars[0].constraint_col +
+                [self.simplex_setup.SLEIneqs[0]])
+        # If minimization is selected, add constraints to the list before variables.
+        else:
+            widget_list = (self.simplex_setup.SLEVars[0].constraint_col + self.simplex_setup.SLEVars +
+                [self.simplex_setup.SLEIneqs[0]])
+        # Create header lables from widget_list, e.g. X1, X2, S1, S2, Z.
         for col, widget in enumerate(widget_list):
             # Give each label in the header row a bottom border to create a line.
             label = SLabelSolve(self.window, widget.get_name(), ["bottom"])

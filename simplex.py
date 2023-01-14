@@ -34,8 +34,8 @@ class SimplexCalculator:
     MAX_CONSTRAINTS = 20
 
     DEFUALT_FONT_SIZE = 15
-    # Sets weather dark palette is on by default.
-    is_dark_mode = False
+    # Sets weather dark mode is on by default.
+    is_dark_mode = True
 
     def __init__(self):
         """
@@ -48,7 +48,7 @@ class SimplexCalculator:
         self.window.resize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.window.setMinimumSize(380, 480)
         self.window.setWindowTitle("Simplex Method")
-        # Used to swap between light and dark mode.
+        # Used when swapping between light and dark mode.
         self.style_sheets = [SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK]
         # All widgets with SIcons should be placed here for color swapping.
         self.icon_buttons = []
@@ -148,6 +148,10 @@ class SimplexCalculator:
         self.icon_buttons.append(settings_button2)
 
         ### Solution Screen Buttons
+        # Solution Step Label -- Display step number out of total steps e.g. 1/3
+        self.soln_step_label = QLabel(self.window)
+        self.soln_step_label.setStyleSheet("font-size: 30px")
+
         # First Solution Button -- Skip to initial step.
         first_soln_button = SCircleButton(self.window)
         first_soln_button.set_icon("first.png")
@@ -166,6 +170,7 @@ class SimplexCalculator:
         next_soln_button.set_icon("next.png")
         next_soln_button.clicked.connect(lambda: self.simplex_solve.next_step())
         self.icon_buttons.append(next_soln_button)
+        # next_soln_button.setDisabled(True)
 
         # Last Solution Button
         last_soln_button = SCircleButton(self.window)
@@ -187,7 +192,8 @@ class SimplexCalculator:
         # Limit range to 12 through 24
         font_size_button.line_edit.editingFinished.connect(lambda: (
             self.QLE_valid_range(font_size_button.line_edit, 12, 24),
-            self.change_font_size(int(font_size_button.line_edit.text()))))
+            self.change_font_size(int(font_size_button.line_edit.text())),
+            font_size_button.line_edit.clearFocus()))
         # font_size_button.set_combo_box(["12", "14", "16", "18", "20", "22", "24"])
         # self.icon_buttons.append(font_size_button)
 
@@ -233,7 +239,7 @@ class SimplexCalculator:
         self.soln_table_layout.setSpacing(0)
         self.soln_table_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
         # Button layout for cycling through solution steps.
-        soln_button_layout = QHBoxLayout()
+        soln_button_layout = QGridLayout()
 
         # Settings Layout
         settings_layout = QGridLayout()
@@ -262,10 +268,11 @@ class SimplexCalculator:
         setup_fields_layout.addLayout(inequality_layout)
 
         # These buttons will sit below solution step table.
-        soln_button_layout.addWidget(first_soln_button)
-        soln_button_layout.addWidget(prev_soln_button)
-        soln_button_layout.addWidget(next_soln_button)
-        soln_button_layout.addWidget(last_soln_button)
+        soln_button_layout.addWidget(self.soln_step_label,   0, 0, 1, 4, Qt.AlignCenter)
+        soln_button_layout.addWidget(first_soln_button, 1, 0)
+        soln_button_layout.addWidget(prev_soln_button,  1, 1)
+        soln_button_layout.addWidget(next_soln_button,  1, 2)
+        soln_button_layout.addWidget(last_soln_button,  1, 3)
 
         # Add scrollbar functionality to setup fields.
         # https://codeloop.org/pyqt5-gui-creating-qscrollarea/
@@ -322,16 +329,17 @@ class SimplexCalculator:
         self.previous_screen = self.setup_screen
 
         # Apply current dark_mode settings to palette and icon buttons.
+        self.is_dark_mode = not self.is_dark_mode
         self.toggle_dark_mode()
         # Create object which destroys/creates all constraint and variable editing fields.
         self.simplex_setup = SimplexSetup(self.window, setup_fields_layout, variables_edit, constraints_edit)
-        # Object which creates solution table when calculate_button is pressed.
+        # Object which creates solution table when calculate_button is pressed goes here.
         self.simplex_solve = None
 
         # Override window's keyPressEvent to do things upon keystrokes.
         self.window.keyPressEvent = self.key_pressed
-        self.window.setLayout(parent_layout)
         # Make go.
+        self.window.setLayout(parent_layout)
         self.window.show()
         sys.exit(self.app.exec())
         # self.app.exec()
@@ -393,13 +401,13 @@ class SimplexCalculator:
         self.is_maximize = not self.is_maximize
 
     def calculate(self) -> None:
-        """Create's SimplexSolve object, deletes old one if it exists, and displays solution frame.
+        """Creates SimplexSolve object, deletes old one if it exists, and displays solution frame.
         Connected to calculate_button.
         """
         if self.simplex_solve is not None:
             self.simplex_solve.delete()
         self.change_screens(self.soln_screen)
-        self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup, self.is_maximize)
+        self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup, self.soln_step_label, self.is_maximize)
 
     def open_settings(self) -> None:
         """Open settings menu.
@@ -438,6 +446,13 @@ class SimplexCalculator:
         # Updates self.font_style, concatenates it with the current dark/light mode style sheet, and sets it.
         self.font_style = (f"QWidget {{font-size: {font_size}px;}}")
         self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
+
+    def open_github(self) -> None:
+        """Opens github repo in default browser.
+
+        https://github.com/nonetypes/SimplexCalculator
+        """
+        pass
 
     def change_screens(self, new_screen: QFrame, is_going_back: bool = False) -> None:
         """Changes frame visibility to new QFrame.
