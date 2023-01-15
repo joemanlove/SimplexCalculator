@@ -8,7 +8,7 @@ import webbrowser
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QSpacerItem, QSizePolicy,
                              QFrame, QGridLayout, QScrollArea, QHBoxLayout, QVBoxLayout)
-from PyQt5.QtGui import QRegExpValidator, QFont
+from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import Qt, QRegExp, QPropertyAnimation, QEasingCurve, QRect
 
 from setup import SimplexSetup
@@ -108,7 +108,6 @@ class SimplexCalculator:
         self.is_maximize = True
         self.max_min_button = QPushButton(self.window)
         self.max_min_button.setText("Maximize")
-        # self.toggle_max_min()
         self.max_min_button.clicked.connect(self.toggle_max_min)
 
         # Randomize Button - Sets random values in all fields.
@@ -189,8 +188,8 @@ class SimplexCalculator:
         font_size_button.set_line_edit()
         font_size_button.line_edit.setText(str(self.DEFUALT_FONT_SIZE))
         font_size_button.line_edit.editingFinished.connect(lambda: (
-            # Limit range to 12 through 24
-            self.QLE_valid_range(font_size_button.line_edit, 12, 24),
+            # Limit range to 12 through 22
+            self.QLE_valid_range(font_size_button.line_edit, 12, 22),
             self.change_font_size(int(font_size_button.line_edit.text())),
             font_size_button.line_edit.clearFocus()))
         # font_size_button.set_combo_box(["12", "14", "16", "18", "20", "22", "24"])
@@ -205,7 +204,6 @@ class SimplexCalculator:
         ### Layouts and Widget Placement
         # Primary layout for main window -- All child layouts are placed here.
         parent_layout = QHBoxLayout()
-        # parent_layout.setSpacing(0)
         parent_layout.setContentsMargins(0, 12, 0, 12)
 
         ### Setup Screen Layouts

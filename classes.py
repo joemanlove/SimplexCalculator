@@ -1,6 +1,10 @@
 """Customized PyQt widgets for Simplex Calculator.
 
+SCircleButton: QToolButton child
 SPushButton: QPushButton child
+SSettingsButton: QToolButton child
+SIcon: QIcon child
+SLabelSolve: QLabel child
 SLEVar: QLineEdit child
 SLECon: QLineEdit child
 SLEIneq: QLineEdit child
