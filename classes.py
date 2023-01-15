@@ -1,6 +1,10 @@
 """Customized PyQt widgets for Simplex Calculator.
 
+SCircleButton: QToolButton child
 SPushButton: QPushButton child
+SSettingsButton: QToolButton child
+SIcon: QIcon child
+SLabelSolve: QLabel child
 SLEVar: QLineEdit child
 SLECon: QLineEdit child
 SLEIneq: QLineEdit child
@@ -100,7 +104,6 @@ class SSettingsButton(QToolButton):
         # The description_label and setting_label (displays current setting) go here.
         self.vert_layout = QVBoxLayout()
         self.vert_layout.setSpacing(4)
-        # self.setContentsMargins(0, 0, 0, 0)
         self.layout().addLayout(self.vert_layout, 0, 1)
 
         # Used to describe setting.
@@ -147,22 +150,13 @@ class SSettingsButton(QToolButton):
 
         Used for font size and decimal places setting.
         """
-        # TODO: Cleanup
         self.line_edit = QLineEdit()
         self.line_edit.setMaxLength(2)
         self.line_edit.setMaximumWidth(40)
-        # self.line_edit.setMaximumHeight(40)
         self.line_edit.setAlignment(Qt.AlignCenter)
         # Limit field input to digits -- Allow empty strings to enable user to clear field.
         self.line_edit.setValidator(QRegExpValidator(QRegExp('(^[0-9]+$|^$)')))
         self.vert_layout.addWidget(self.line_edit)
-        # self.layout().addWidget(self.line_edit)
-
-        def focus_out(event):
-            # self.line_edit.clearFocus()
-            self.clearFocus()
-            # self.line_edit.nextInFocusChain()
-            self.setDown(False)
         
         # Force clicking on entire setting button to engage widget.
         def mouse_release(event):
@@ -171,25 +165,6 @@ class SSettingsButton(QToolButton):
             self.line_edit.selectAll()
 
         self.mouseReleaseEvent = mouse_release
-        # self.focusOutEvent = focus_out
-        # If space bar is pressed, engage widget.
-        # self.keyPressEvent = lambda event: self.line_edit.setFocus() if event.key() == Qt.Key_Space else None
-        # self.line_edit.setFocusPolicy(Qt.NoFocus)        
-
-    def set_combo_box(self, items: list):
-        """Creates a QComboBox -- or drop down menu.
-
-        Unfinished -- Error prone on linux.
-        """
-        # Strange error on linux: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/issues/288
-        self.combo_box = QComboBox()
-        self.combo_box.addItems(items)
-        self.combo_box.setStyleSheet("border: none")
-        # Force clicking on entire setting button to engage widget.
-        self.mousePressEvent = self.combo_box.mousePressEvent
-        self.vert_layout.addWidget(self.combo_box)
-        # self.layout().addWidget(self.combo_box, 0, 2)
-
 
 class SLabelSetting(QLabel):
     """Setting label for SSettingsButton. Displays current setting text
@@ -372,12 +347,6 @@ class SLEVar(SLineEdit):
         label = QLabel(window)
         label.setIndent(1)
         label.setAlignment(Qt.AlignLeft)
-        # Add extra padding for alignmet with "Constraint #" labels
-        # label_style = "padding-right: 26px" if col_index == 0 else ""
-        # label.setStyleSheet(label_style)
-        # Extra spaces are added to align with "Constraint #"
-        # label_text = "Objective: " if col_index == 0 else "+"
-        # TODO: Default value should either reflect objective function name input or be more descriptive.
         # The first component displays objective function name instead of "+".
         label_text = "Z:" if col_index == 0 else "+"
 
@@ -446,10 +415,6 @@ class SLECon(SLineEdit):
         label = QLabel(window)
         label.setIndent(1)
         label.setAlignment(Qt.AlignLeft)
-        # Add extra padding for alignmet with "Constraint 10" labels
-        # label_style = "padding-right: 8px" if col_index == 0 and row_index < 10 else ""
-        # label.setStyleSheet(label_style)
-        # label_text = f"Constraint {row_index}: " if col_index == 0 else "+"
         sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
         # Label will be "+" if not the first in a row, otherwise it will be constraint number label.
         label_text = f"C{row_index}:".translate(sub) if col_index == 0 else "+"
@@ -530,8 +495,3 @@ class SLEIneq(SLineEdit):
             The value of the edit field. Used to get name of objective function for solution table labeling.
         """
         return self.text()
-
-
-if __name__ == "__main__":
-    from simplex import SimplexCalculator
-    simplex = SimplexCalculator()

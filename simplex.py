@@ -19,6 +19,7 @@ from styles import SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK
 
 class SimplexCalculator:
     """Main class for Simplex Calculator.
+
     Main PyQt window and app, as well as buttons and layouts are kept here.
     Handles SimplexSetup and SimplexSolve objects -- setup fields handling and applying simplex method respectively.
     """
@@ -108,7 +109,6 @@ class SimplexCalculator:
         self.is_maximize = True
         self.max_min_button = QPushButton(self.window)
         self.max_min_button.setText("Maximize")
-        # self.toggle_max_min()
         self.max_min_button.clicked.connect(self.toggle_max_min)
 
         # Randomize Button - Sets random values in all fields.
@@ -189,12 +189,10 @@ class SimplexCalculator:
         font_size_button.set_line_edit()
         font_size_button.line_edit.setText(str(self.DEFUALT_FONT_SIZE))
         font_size_button.line_edit.editingFinished.connect(lambda: (
-            # Limit range to 12 through 24
-            self.QLE_valid_range(font_size_button.line_edit, 12, 24),
+            # Limit range to 12 through 22
+            self.QLE_valid_range(font_size_button.line_edit, 12, 22),
             self.change_font_size(int(font_size_button.line_edit.text())),
             font_size_button.line_edit.clearFocus()))
-        # font_size_button.set_combo_box(["12", "14", "16", "18", "20", "22", "24"])
-        # self.icon_buttons.append(font_size_button)
 
         # Opens GitHub repo.
         github_button = SSettingsButton(self.window, "Visit Simplex Calculator on GitHub")
@@ -205,7 +203,6 @@ class SimplexCalculator:
         ### Layouts and Widget Placement
         # Primary layout for main window -- All child layouts are placed here.
         parent_layout = QHBoxLayout()
-        # parent_layout.setSpacing(0)
         parent_layout.setContentsMargins(0, 12, 0, 12)
 
         ### Setup Screen Layouts
@@ -243,10 +240,6 @@ class SimplexCalculator:
         # Settings Layout
         settings_layout = QGridLayout()
         settings_layout.setAlignment(Qt.AlignTop)
-
-        # Spacers to fill empty voids and force items in layouts into desired positions.
-        hori_spacer = QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        vert_spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         # Placement of initial setup button -- constraint/variable labels, +/- buttons, and edit fields.
         setup_buttons_layout.addWidget(variables_label,      0, 0, 1, 3, Qt.AlignCenter)
@@ -503,7 +496,3 @@ class SimplexCalculator:
         if event.key() == Qt.Key_Escape:
             self.window.close()
             self.app.quit()
-
-
-if __name__ == "__main__":
-    simplex_calculator = SimplexCalculator()

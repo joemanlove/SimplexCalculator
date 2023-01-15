@@ -70,13 +70,11 @@ class SimplexSolve:
                 scalar = row_vector[pivot_col]
                 for i in range(len(row_vector)):
                     row_vector[i] -= scalar*matrix[pivot_row][i]
+
             # Save completed step.
             self.soln_matrices.append(matrix)
             # Get copy of completed step.
             matrix = deepcopy(self.soln_matrices[-1])
-
-            # print(str(Fraction(pivot).limit_denominator()))
-            # [print([str(Fraction(x).limit_denominator()) for x in row]) for row in matrix]
 
     def find_pivot(self, matrix: list) -> tuple:
         """Find the current pivot and return its matrix indices and value.
@@ -246,8 +244,3 @@ class SimplexSolve:
                 deleted_widget.deleteLater()
                 del deleted_widget
         del self
-
-
-if __name__ == "__main__":
-    from simplex import SimplexCalculator
-    simplex_calculator = SimplexCalculator()

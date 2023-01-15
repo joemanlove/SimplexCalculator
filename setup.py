@@ -151,15 +151,6 @@ class SimplexSetup:
 
             If there is no entry, default to 0.
             """
-            # if is_floats:
-            #     if widget.text():
-            #         component = float(widget.text())
-            #     else:
-            #         component = 0.0
-            #         widget.setText("0")
-            # else:
-            #     component = widget
-            # return component
             return (float(widget.text()) if widget.text() else 0.0) if is_floats else widget
 
         # It is more convenient to construct the transpose first with current structure.
@@ -243,8 +234,3 @@ class SimplexSetup:
         for ineq in self.SLEIneqs[1:]:
             # 25% chance of 1 - 10 for constraint value, 75% chance of 10+
             ineq.setText(random_field_val(25, range_one, range_two))
-
-
-if __name__ == "__main__":
-    from simplex import SimplexCalculator
-    simplex_calculator = SimplexCalculator()

@@ -127,8 +127,3 @@ def replace_colors(style: str, color_map: dict) -> str:
 
 SIMPLEX_STYLE_LIGHT = replace_colors(SIMPLEX_STYLE_SHEET, light_map)
 SIMPLEX_STYLE_DARK = replace_colors(SIMPLEX_STYLE_SHEET, dark_map)
-
-
-if __name__ == "__main__":
-    from simplex import SimplexCalculator
-    simplex = SimplexCalculator()
