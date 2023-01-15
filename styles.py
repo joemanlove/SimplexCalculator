@@ -1,26 +1,8 @@
-"""Style sheet themes for Simplex Calculator.
+"""Color definitions and style sheets for Simplex Calculator.
 """
 
-def replace_colors(style: str, color_map: dict) -> str:
-    """Replaces color variable names in a PyQt style sheet (multi-line string) with hexidecimal color values.
-
-    Parameters
-    ---
-    style: string
-        Must be properly formatted as a PyQt style sheet
-        https://doc.qt.io/qtforpython/overviews/stylesheet-examples.html
-    color_map: dictionary
-        Used to replace variable names with hexidecimal values
-
-    Returns
-    ---
-    str
-        A style sheet string for PyQt widget.
-    """
-    for key, val in color_map.items():
-        style = style.replace(key, val)
-    return style
-
+SIMPLEX_ICON_LIGHT = "#323232"
+SIMPLEX_ICON_DARK = "#F0F0F0"
 
 light_map = {
     "bg_prime": "#F0F0F0",
@@ -31,7 +13,7 @@ light_map = {
     "border_sub": "#B9B9B9",
     "button_select": "#F0F0F0",
     "icon-select": "#D9D9D9",
-    "focus_color": "#FFFFFF"
+    "focus_color": "#FFFFFF",
 }
 
 dark_map = {
@@ -43,10 +25,8 @@ dark_map = {
     "border_sub": "#292929",
     "button_select": "#353535",
     "icon-select": "#424242",
-    "focus_color": "#292929"
+    "focus_color": "#292929",
 }
-
-        # font-size: 16px;
 
 SIMPLEX_STYLE_SHEET = ("""
     QWidget {
@@ -125,8 +105,25 @@ SIMPLEX_STYLE_SHEET = ("""
     }
 """)
 
+def replace_colors(style: str, color_map: dict) -> str:
+    """Replaces color variable names in a PyQt style sheet (multi-line string) with hexidecimal color values.
+
+    Parameters
+    ---
+    style: string
+        Must be properly formatted as a PyQt style sheet
+        https://doc.qt.io/qtforpython/overviews/stylesheet-examples.html
+    color_map: dictionary
+        Used to replace variable names with hexidecimal values
+
+    Returns
+    ---
+    str
+        A style sheet string for PyQt widget.
+    """
+    for key, val in color_map.items():
+        style = style.replace(key, val)
+    return style
+
 SIMPLEX_STYLE_LIGHT = replace_colors(SIMPLEX_STYLE_SHEET, light_map)
 SIMPLEX_STYLE_DARK = replace_colors(SIMPLEX_STYLE_SHEET, dark_map)
-
-SIMPLEX_ICON_LIGHT = "#323232"
-SIMPLEX_ICON_DARK = "#F0F0F0"

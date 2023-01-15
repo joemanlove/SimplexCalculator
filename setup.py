@@ -3,6 +3,7 @@ depending on constraint and variable numbers set by user.
 """
 
 from random import randint, choice
+
 from PyQt5.QtWidgets import QWidget, QLineEdit, QGridLayout
 
 from classes import SLEVar, SLECon, SLEIneq
@@ -76,7 +77,8 @@ class SimplexSetup:
         # Adding variable and associated constraint widgets.
         if edit_var_num > crnt_var_num:
             for col in range(crnt_var_num, edit_var_num):
-                # Create constraints -- SLEVar object handles all constraint's in its column for variable name association.
+                # Create constraints
+                # SLEVar object handles all constraint's in its column for variable name association.
                 constraint_col = []
                 for row in range(edit_con_num):
                     # Add 1 to row to account for objective function row.
@@ -100,6 +102,7 @@ class SimplexSetup:
         order is set to order in which widgets are added to the main PyQt QWidget window.
         """
         # To correctly set tab order, widgets must be set in the same order as the intended tab order.
+        # e.g. This will NOT work as intended: .setTabOrder(B, C) then .setTabOrder(A, B)
 
         # Get a matrix of the objects themselves.
         matrix = self.get_fields(False, False)
@@ -167,11 +170,12 @@ class SimplexSetup:
         for i, widget in enumerate(self.SLEVars):
             matrix[i].append(get_component(widget))
 
-        # Value of objective inequality field should always be 0 when not the object itself as field is for naming purposes.
+        # Value of objective inequality field should always be 0
+        # when not the object itself as field is for naming purposes.
         component = 0.0 if is_floats else self.SLEIneqs[0]
         matrix[-1].append(component)
 
-        # Since matrix is currenlty the transpose, transpose it to get not the transpose.
+        # Since matrix is currenlty the transpose, transpose it to get the non-transposed matrix.
         if not transpose:
             # https://stackoverflow.com/a/4937526
             matrix = list(map(list, zip(*matrix)))
@@ -230,8 +234,3 @@ class SimplexSetup:
         for ineq in self.SLEIneqs[1:]:
             # 25% chance of 1 - 10 for constraint value, 75% chance of 10+
             ineq.setText(random_field_val(25, range_one, range_two))
-
-
-if __name__ == "__main__":
-    from simplex import SimplexCalculator
-    simplex_calculator = SimplexCalculator()

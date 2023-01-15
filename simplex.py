@@ -4,6 +4,7 @@ Made with PyQt5
 """
 
 import sys
+import webbrowser
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QSpacerItem, QSizePolicy,
                              QFrame, QGridLayout, QScrollArea, QHBoxLayout, QVBoxLayout)
@@ -18,6 +19,7 @@ from styles import SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK
 
 class SimplexCalculator:
     """Main class for Simplex Calculator.
+
     Main PyQt window and app, as well as buttons and layouts are kept here.
     Handles SimplexSetup and SimplexSolve objects -- setup fields handling and applying simplex method respectively.
     """
@@ -107,7 +109,6 @@ class SimplexCalculator:
         self.is_maximize = True
         self.max_min_button = QPushButton(self.window)
         self.max_min_button.setText("Maximize")
-        # self.toggle_max_min()
         self.max_min_button.clicked.connect(self.toggle_max_min)
 
         # Randomize Button - Sets random values in all fields.
@@ -127,7 +128,7 @@ class SimplexCalculator:
         calculate_button.clicked.connect(self.calculate)
 
         # Back Button -- Go back to the previous screen.
-        # Duplicate buttons are necessary because the same widget cannot be in two different frames or layouts
+        # Duplicate buttons are necessary because the same widget cannot be in two different frames or layouts.
         back_button = SCircleButton(self.window)
         back_button.set_icon("back.png")
         back_button.clicked.connect(self.go_back)
@@ -176,7 +177,6 @@ class SimplexCalculator:
         last_soln_button.set_icon("last.png")
         last_soln_button.clicked.connect(lambda: self.simplex_solve.last_step())
         self.icon_buttons.append(last_soln_button)
-        # last_soln_button.setDisabled(True)
 
         ### Settings Screen Buttons
         # Toggle Dark Mode Button
@@ -188,18 +188,16 @@ class SimplexCalculator:
         font_size_button = SSettingsButton(self.window, "Font Size")
         font_size_button.set_line_edit()
         font_size_button.line_edit.setText(str(self.DEFUALT_FONT_SIZE))
-        # Limit range to 12 through 24
         font_size_button.line_edit.editingFinished.connect(lambda: (
-            self.QLE_valid_range(font_size_button.line_edit, 12, 24),
+            # Limit range to 12 through 22
+            self.QLE_valid_range(font_size_button.line_edit, 12, 22),
             self.change_font_size(int(font_size_button.line_edit.text())),
             font_size_button.line_edit.clearFocus()))
-        # font_size_button.set_combo_box(["12", "14", "16", "18", "20", "22", "24"])
-        # self.icon_buttons.append(font_size_button)
 
         # Opens GitHub repo.
         github_button = SSettingsButton(self.window, "Visit Simplex Calculator on GitHub")
         github_button.set_icon("github.png")
-        github_button.clicked.connect(lambda: print("Pressing Github Button. TODO: Replace this."))
+        github_button.clicked.connect(self.open_github)
         self.icon_buttons.append(github_button)
 
         ### Layouts and Widget Placement
@@ -382,14 +380,13 @@ class SimplexCalculator:
         """Toggles between maximize/minimize when self.max_min_button is pressed,
         changing inequality labels and dictating simplex calulation approach.
         """
-        if self.is_maximize:
-            self.max_min_button.setText("Minimize")
-            # Index slice to exclude first element as that is the objective function's "=".
-            for i in range(len(self.simplex_setup.SLEIneqs))[1:]:
+        # Index slice to exclude first element as that is the objective function's "=".
+        for i in range(len(self.simplex_setup.SLEIneqs))[1:]:
+            if self.is_maximize:
+                self.max_min_button.setText("Minimize")
                 self.simplex_setup.SLEIneqs[i].label.setText("≥")
-        else:
-            self.max_min_button.setText("Maximize")
-            for i in range(len(self.simplex_setup.SLEIneqs))[1:]:
+            else:
+                self.max_min_button.setText("Maximize")
                 self.simplex_setup.SLEIneqs[i].label.setText("≤")
         self.is_maximize = not self.is_maximize
 
@@ -401,7 +398,7 @@ class SimplexCalculator:
             self.simplex_solve.delete()
         self.change_screens(self.soln_screen)
         self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup,
-                                self.soln_step_label, self.is_maximize)
+            self.soln_step_label, self.is_maximize)
 
     def open_settings(self) -> None:
         """Open settings menu.
@@ -428,9 +425,9 @@ class SimplexCalculator:
             button.icon.color_swap(self.is_dark_mode)
 
     def change_font_size(self, font_size: int) -> None:
-        """Changes font size via global style sheet  limited user input.
+        """Changes font size via global style sheet from limited user input.
 
-        Connected to font_size_button.
+        Connected to font_size_button in settings screen.
 
         Parameters
         ---
@@ -439,6 +436,13 @@ class SimplexCalculator:
         # Updates self.font_style, concatenates it with the current dark/light mode style sheet, and sets it.
         self.font_style = (f"QWidget {{font-size: {font_size}px;}}")
         self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
+
+    def open_github(self) -> None:
+        """Opens Simplex Calculator's GitHub repo in the default browser.
+
+        https://github.com/nonetypes/SimplexCalculator
+        """
+        webbrowser.get().open("https://github.com/nonetypes/SimplexCalculator", new = 2)
 
     def change_screens(self, new_screen: QFrame, is_going_back: bool = False) -> None:
         """Changes frame visibility to new QFrame.
@@ -458,13 +462,6 @@ class SimplexCalculator:
         new_screen.setDisabled(False)
         new_screen.show()
 
-        # When changing from settings screen back to solutions screen, prevent back button from going back to settings.
-        if self.current_screen == self.settings_screen and new_screen == self.soln_screen:
-            self.previous_screen = self.setup_screen
-        else:
-            self.previous_screen = self.current_screen
-        self.current_screen = new_screen
-
         # Create animation to make new screen "slide" into view.
         # https://forum.qt.io/topic/3709/simple-animation-not-working/3
         self.animation = QPropertyAnimation(new_screen, b"geometry")
@@ -475,13 +472,20 @@ class SimplexCalculator:
         if is_going_back:
             self.animation.setStartValue(QRect(-self.window.width(), self.current_screen.y(),
                 self.window.width(), self.window.height()))
-            self.animation.setEndValue(self.current_screen.geometry())
         # If back button was not pressed, screen will appear to slide in from right.
         else:
             self.animation.setStartValue(QRect(self.window.width(), self.current_screen.y(),
                 self.window.width(), self.window.height()))
-            self.animation.setEndValue(self.current_screen.geometry())
+
+        self.animation.setEndValue(self.current_screen.geometry())
         self.animation.start()
+
+        # When changing from settings screen back to solutions screen, prevent back button from going back to settings.
+        if self.current_screen == self.settings_screen and new_screen == self.soln_screen:
+            self.previous_screen = self.setup_screen
+        else:
+            self.previous_screen = self.current_screen
+        self.current_screen = new_screen
 
     def key_pressed(self, event):
         """Override function for main window.
@@ -492,7 +496,3 @@ class SimplexCalculator:
         if event.key() == Qt.Key_Escape:
             self.window.close()
             self.app.quit()
-
-
-if __name__ == "__main__":
-    simplex_calculator = SimplexCalculator()

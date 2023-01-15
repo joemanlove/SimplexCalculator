@@ -1,6 +1,10 @@
 """Customized PyQt widgets for Simplex Calculator.
 
+SCircleButton: QToolButton child
 SPushButton: QPushButton child
+SSettingsButton: QToolButton child
+SIcon: QIcon child
+SLabelSolve: QLabel child
 SLEVar: QLineEdit child
 SLECon: QLineEdit child
 SLEIneq: QLineEdit child
@@ -9,7 +13,7 @@ SLEIneq: QLineEdit child
 from os import path
 
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QComboBox,
-                            QToolButton, QSizePolicy, QHBoxLayout, QVBoxLayout)
+                             QToolButton, QSizePolicy, QHBoxLayout, QVBoxLayout)
 from PyQt5.QtGui import QRegExpValidator, QRegion, QPixmap, QColor, QIcon, QPixmap
 from PyQt5.QtCore import Qt, QRegExp
 
@@ -23,14 +27,6 @@ class SCircleButton(QToolButton):
 
     https://stackoverflow.com/a/48291001
     """
-    def __init__(self, window: QWidget):
-        """Child class of PyQt QToolButton. Forces button selection to be a circle.
-
-        Parameters
-        ---
-        window: PyQt QWidget
-        """
-        super().__init__(window)
 
     def resizeEvent(self, event) -> None:
         """Force button selection area to be a circle.
@@ -108,7 +104,6 @@ class SSettingsButton(QToolButton):
         # The description_label and setting_label (displays current setting) go here.
         self.vert_layout = QVBoxLayout()
         self.vert_layout.setSpacing(4)
-        # self.setContentsMargins(0, 0, 0, 0)
         self.layout().addLayout(self.vert_layout, 0, 1)
 
         # Used to describe setting.
@@ -170,7 +165,6 @@ class SSettingsButton(QToolButton):
             self.line_edit.selectAll()
 
         self.mouseReleaseEvent = mouse_release
-
 
 class SLabelSetting(QLabel):
     """Setting label for SSettingsButton. Displays current setting text
@@ -353,7 +347,7 @@ class SLEVar(SLineEdit):
         label = QLabel(window)
         label.setIndent(1)
         label.setAlignment(Qt.AlignLeft)
-        # The first component displays objective function name instead of "+"
+        # The first component displays objective function name instead of "+".
         label_text = "Z:" if col_index == 0 else "+"
         label.setText(label_text)
 
@@ -497,8 +491,3 @@ class SLEIneq(SLineEdit):
             The value of the edit field. Used to get name of objective function for solution table labeling.
         """
         return self.text()
-
-
-if __name__ == "__main__":
-    from simplex import SimplexCalculator
-    simplex = SimplexCalculator()
