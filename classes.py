@@ -151,34 +151,21 @@ class SSettingsButton(QToolButton):
 
         Used for font size and decimal places setting.
         """
-        # TODO: Cleanup
         self.line_edit = QLineEdit()
         self.line_edit.setMaxLength(2)
         self.line_edit.setMaximumWidth(40)
-        # self.line_edit.setMaximumHeight(40)
         self.line_edit.setAlignment(Qt.AlignCenter)
         # Limit field input to digits -- Allow empty strings to enable user to clear field.
         self.line_edit.setValidator(QRegExpValidator(QRegExp('(^[0-9]+$|^$)')))
         self.vert_layout.addWidget(self.line_edit)
-        # self.layout().addWidget(self.line_edit)
-
-        def focus_out(event):
-            # self.line_edit.clearFocus()
-            self.clearFocus()
-            # self.line_edit.nextInFocusChain()
-            self.setDown(False)
         
-        # Force clicking on entire setting button to engage widget.
+        # Force clicking on entire setting button to engage QLineEdit field.
         def mouse_release(event):
             self.setDown(False)
             self.line_edit.setFocus()
             self.line_edit.selectAll()
 
         self.mouseReleaseEvent = mouse_release
-        # self.focusOutEvent = focus_out
-        # If space bar is pressed, engage widget.
-        # self.keyPressEvent = lambda event: self.line_edit.setFocus() if event.key() == Qt.Key_Space else None
-        # self.line_edit.setFocusPolicy(Qt.NoFocus)        
 
     def set_combo_box(self, items: list):
         """Creates a QComboBox -- or drop down menu.
@@ -376,12 +363,6 @@ class SLEVar(SLineEdit):
         label = QLabel(window)
         label.setIndent(1)
         label.setAlignment(Qt.AlignLeft)
-        # Add extra padding for alignmet with "Constraint #" labels
-        # label_style = "padding-right: 26px" if col_index == 0 else ""
-        # label.setStyleSheet(label_style)
-        # Extra spaces are added to align with "Constraint #"
-        # label_text = "Objective: " if col_index == 0 else "+"
-        # TODO: Default value should either reflect objective function name input or be more descriptive.
         # The first component displays objective function name instead of "+".
         label_text = "Z:" if col_index == 0 else "+"
 
@@ -450,10 +431,6 @@ class SLECon(SLineEdit):
         label = QLabel(window)
         label.setIndent(1)
         label.setAlignment(Qt.AlignLeft)
-        # Add extra padding for alignmet with "Constraint 10" labels
-        # label_style = "padding-right: 8px" if col_index == 0 and row_index < 10 else ""
-        # label.setStyleSheet(label_style)
-        # label_text = f"Constraint {row_index}: " if col_index == 0 else "+"
         sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
         # Label will be "+" if not the first in a row, otherwise it will be constraint number label.
         label_text = f"C{row_index}:".translate(sub) if col_index == 0 else "+"

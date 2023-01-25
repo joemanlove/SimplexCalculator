@@ -14,6 +14,8 @@
 # Allow negative numbers as input for constraint fields (and objetive function?)
 # Allow ability to switch inequalites of contraints.
 ## UI
+# Make the rows of the solution screen tables selectable to highlight the row.
+# When screen changing, new screen displays briefly in place before entering screen -- sometimes.
 # Redo setup screen buttons with icons.
 # Add header to screens which displays name and preserves settings/back buttons?
 # Allow user to name contraint rows.

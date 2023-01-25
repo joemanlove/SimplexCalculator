@@ -78,7 +78,7 @@ class SimplexSetup:
         if edit_var_num > crnt_var_num:
             for col in range(crnt_var_num, edit_var_num):
                 # Create constraints
-                # SLEVar object handles all constraint's in its column for variable name association.
+                # SLEVar object handles all constraints in its column for variable name association.
                 constraint_col = []
                 for row in range(edit_con_num):
                     # Add 1 to row to account for objective function row.
@@ -190,6 +190,28 @@ class SimplexSetup:
             matrix = list(map(list, zip(*matrix)))
 
         return matrix
+
+    def is_valid(self) -> bool:
+        """Validates whether or not the resulting entry field matrix is solvable or not.
+        Validity is determined on whether or not a constraint column is full of zeros while there is
+        a positive number in the corresponding variable of the objective function.
+
+        Returns
+        ---
+        bool
+            True if the matrix is solvable, False otherwise.
+        """
+        # Get the transposed matrix of the entry fields.
+        matrix = self.get_fields(True)
+        for vector in matrix:
+            # If the objective function's variable is positive for the column.
+            if vector[-1] > 0:
+                # Fill a list with True for every 0 -- False otherwise.
+                booleans = [x == 0 for x in vector[:-1]]
+                # If the column is all zeros, return False.
+                if sum(booleans) == len(booleans):
+                    return False
+        return True
 
     def reset_fields(self) -> None:
         """Clears all initial setup value fields.

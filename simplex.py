@@ -18,7 +18,7 @@ from styles import SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK
 
 
 class SimplexCalculator:
-    """Main class for Simplex Calculator.
+    """Gui class for Simplex Calculator.
     Main PyQt window and app, as well as buttons and layouts are kept here.
     Handles SimplexSetup and SimplexSolve objects -- setup fields handling and applying simplex method respectively.
     """
@@ -192,7 +192,6 @@ class SimplexCalculator:
             self.QLE_valid_range(font_size_button.line_edit, 12, 22),
             self.change_font_size(int(font_size_button.line_edit.text())),
             font_size_button.line_edit.clearFocus()))
-        # font_size_button.set_combo_box(["12", "14", "16", "18", "20", "22", "24"])
         # self.icon_buttons.append(font_size_button)
 
         # Opens GitHub repo.
@@ -214,8 +213,7 @@ class SimplexCalculator:
         setup_buttons_layout.setSpacing(6)
         # Variable name edit fields and all constraint labels/edit fields go here.
         constraints_layout = QGridLayout()
-        constraints_layout.setVerticalSpacing(2)
-        constraints_layout.setHorizontalSpacing(2)
+        constraints_layout.setSpacing(2)
         constraints_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
         # The inequalities and associated values are placed here.
         # This is a separate layout because they are present on the far right regardless of how many variables there are.
@@ -305,14 +303,16 @@ class SimplexCalculator:
         settings_layout.addWidget(github_button,         3, 0)
 
         # Frames will contain primary layouts and be hidden/shown to simulate different "screens".
-        self.setup_screen = QFrame()
+        self.setup_screen = QFrame(self.window)
         self.setup_screen.setLayout(setup_parent_layout)
+        # self.setup_screen.setGeometry(0, 0, self.window.width(), self.window.height())
+        # self.setup_screen.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self.soln_screen = QFrame()
+        self.soln_screen = QFrame(self.window)
         self.soln_screen.setLayout(soln_parent_layout)
         self.soln_screen.hide()
 
-        self.settings_screen = QFrame()
+        self.settings_screen = QFrame(self.window)
         self.settings_screen.setLayout(settings_layout)
         self.settings_screen.hide()
 
@@ -383,7 +383,7 @@ class SimplexCalculator:
 
     def toggle_max_min(self) -> None:
         """Toggles between maximize/minimize when self.max_min_button is pressed,
-        changing inequality labels and dictating simplex calulation approach.
+        changing inequality labels and dictating simplex calculation approach.
         """
         # Index slice to exclude first element as that is the objective function's "=".
         for i in range(len(self.simplex_setup.SLEIneqs))[1:]:
@@ -399,11 +399,14 @@ class SimplexCalculator:
         """Creates SimplexSolve object, deletes old one if it exists, and displays solution frame.
         Connected to calculate_button.
         """
-        if self.simplex_solve is not None:
-            self.simplex_solve.delete()
-        self.change_screens(self.soln_screen)
-        self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup,
-            self.soln_step_label, self.is_maximize)
+        if self.simplex_setup.is_valid():
+            if self.simplex_solve is not None:
+                self.simplex_solve.delete()
+            self.change_screens(self.soln_screen)
+            self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup,
+                self.soln_step_label, self.is_maximize)
+        else:
+            print("Matrix not solvable.")
 
     def open_settings(self) -> None:
         """Open settings menu.

@@ -58,9 +58,9 @@ class SimplexSolve:
 
         # Continue until the bottom row is all positive.
         while has_negative(matrix[-1]):
-            pivot_row, pivot_col, pivot = self.find_pivot(matrix)
+            pivot_row, pivot_col, pivot_val = self.get_pivot(matrix)
             # Make pivot value 1 by dividing the pivot row by the pivot value.
-            matrix[pivot_row] = [x/pivot for x in matrix[pivot_row]]
+            matrix[pivot_row] = [x/pivot_val for x in matrix[pivot_row]]
 
             # Clear the pivot column, leaving only the pivot (now 1) and making the rest zeros:
             # Loop through each row -- excluding pivot row -- and subtract each component in the row by the
@@ -75,10 +75,7 @@ class SimplexSolve:
             # Get copy of completed step.
             matrix = deepcopy(self.soln_matrices[-1])
 
-            # print(str(Fraction(pivot).limit_denominator()))
-            # [print([str(Fraction(x).limit_denominator()) for x in row]) for row in matrix]
-
-    def find_pivot(self, matrix: list) -> tuple:
+    def get_pivot(self, matrix: list) -> tuple:
         """Find the current pivot and return its matrix indices and value.
 
         Parameters
@@ -98,7 +95,7 @@ class SimplexSolve:
         # Divide each component of the last column with its row's pivot_col component. Exclude bottom row.
         # A None will be placed in the list for negatives or zeros in pivot column to be discounted in next step.
         divided_col = [x[-1] / x[pivot_col] if x[pivot_col] > 0 else None for x in matrix[:-1]]
-        # Get the index of the smallest value -- while discounting any Nones in the list.)
+        # Get the index of the smallest value -- while discounting any Nones in the list.
         pivot_row = divided_col.index(min([x for x in divided_col if x is not None]))
         return (pivot_row, pivot_col, matrix[pivot_row][pivot_col])
 
