@@ -54,15 +54,17 @@ class SimplexCalculator:
         self.style_sheets = [SIMPLEX_STYLE_LIGHT, SIMPLEX_STYLE_DARK]
         # All widgets with SIcons should be placed here for color swapping.
         self.icon_buttons = []
-        self.font_style = (f"QWidget {{font-size: {self.DEFUALT_FONT_SIZE}px;}}")
+        self.font_style = (
+            f"QWidget {{font-size: {self.DEFUALT_FONT_SIZE}px;}}")
 
-        ### Setting Variables
+        # Setting Variables
         variables_label = QLabel(self.window)
         variables_label.setText("Set Variables")
         # Decrease Variables Button
         variables_decrease = SPushButton(self.window, "-", self.WIDGET_WIDTH)
         variables_decrease.clicked.connect(lambda: (
-            self.QLE_inc_dec(variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES, False),
+            self.QLE_inc_dec(variables_edit, self.MIN_VARIABLES,
+                             self.MAX_VARIABLES, False),
             self.simplex_setup.update()))
         # QLineEdit Widget -- Updates as increase/decrease are pressed and is editable.
         variables_edit = QLineEdit(self.window)
@@ -73,36 +75,42 @@ class SimplexCalculator:
         variables_edit.setMaximumWidth(self.WIDGET_WIDTH)
         variables_edit.setAlignment(Qt.AlignCenter)
         variables_edit.editingFinished.connect(lambda: (
-            self.QLE_valid_range(variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES),
+            self.QLE_valid_range(
+                variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES),
             self.simplex_setup.update()))
         # Increase Variables Button
         variables_increase = SPushButton(self.window, "+", self.WIDGET_WIDTH)
         variables_increase.clicked.connect(lambda: (
-            self.QLE_inc_dec(variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES),
+            self.QLE_inc_dec(
+                variables_edit, self.MIN_VARIABLES, self.MAX_VARIABLES),
             self.simplex_setup.update()))
 
-        ### Setting Constraints
+        # Setting Constraints
         constraints_label = QLabel(self.window)
         constraints_label.setText("Set Constraints")
         # Decrease Constraints Button
         constraints_decrease = SPushButton(self.window, "-", self.WIDGET_WIDTH)
         constraints_decrease.clicked.connect(lambda: (
-            self.QLE_inc_dec(constraints_edit, self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS, False),
+            self.QLE_inc_dec(constraints_edit, self.MIN_CONSTRAINTS,
+                             self.MAX_CONSTRAINTS, False),
             self.simplex_setup.update()))
         # QLineEdit Widget -- Updates as increase/decrease are pressed and is direclty editable.
         constraints_edit = QLineEdit(self.window)
-        constraints_edit.setValidator(QRegExpValidator(QRegExp('(^[0-9]+$|^$)')))
+        constraints_edit.setValidator(
+            QRegExpValidator(QRegExp('(^[0-9]+$|^$)')))
         constraints_edit.setMaxLength(2)
         constraints_edit.setText(str(self.START_CONSTRAINTS))
         constraints_edit.setMaximumWidth(self.WIDGET_WIDTH)
         constraints_edit.setAlignment(Qt.AlignCenter)
         constraints_edit.editingFinished.connect(lambda: (
-            self.QLE_valid_range(constraints_edit, self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS),
+            self.QLE_valid_range(
+                constraints_edit, self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS),
             self.simplex_setup.update()))
         # Increase Constraints Button
         constraints_increase = SPushButton(self.window, "+", self.WIDGET_WIDTH)
         constraints_increase.clicked.connect(lambda: (
-            self.QLE_inc_dec(constraints_edit, self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS),
+            self.QLE_inc_dec(constraints_edit,
+                             self.MIN_CONSTRAINTS, self.MAX_CONSTRAINTS),
             self.simplex_setup.update()))
 
         # Toggle Maximize/Minimize Button
@@ -115,7 +123,8 @@ class SimplexCalculator:
         randomize__button = QPushButton(self.window)
         randomize__button.setText("Randomize")
         # Lambdas are necessary because object does not yet exist as it requires layouts which do not exist.
-        randomize__button.clicked.connect(lambda: self.simplex_setup.randomize_fields())
+        randomize__button.clicked.connect(
+            lambda: self.simplex_setup.randomize_fields())
 
         # Reset Button
         reset_button = QPushButton(self.window)
@@ -129,56 +138,76 @@ class SimplexCalculator:
 
         # Back Button -- Go back to the previous screen.
         # Duplicate buttons are necessary because the same widget cannot be in two different frames or layouts.
-        back_button = SCircleButton(self.window)
-        back_button.set_icon("back.png")
+        # back_button = SCircleButton(self.window)
+        # back_button.set_icon("back.png")
+        back_button = QPushButton(self.window)
+        back_button.setText("Back")
         back_button.clicked.connect(self.go_back)
         self.icon_buttons.append(back_button)
-        back_button2 = SCircleButton(self.window)
-        back_button2.set_icon("back.png")
+        # back_button2 = SCircleButton(self.window)
+        # back_button2.set_icon("back.png")
+        back_button2 = QPushButton(self.window)
+        back_button2.setText("Back")
         back_button2.clicked.connect(self.go_back)
         self.icon_buttons.append(back_button2)
 
         # Settings Button -- Open Settings screen.
-        settings_button = SCircleButton(self.window)
-        settings_button.set_icon("settings.png")
+        # settings_button = SCircleButton(self.window)
+        # settings_button.set_icon("settings.png")
+        settings_button = QPushButton(self.window)
+        settings_button.setText("Settings")
         settings_button.clicked.connect(self.open_settings)
         self.icon_buttons.append(settings_button)
-        settings_button2 = SCircleButton(self.window)
-        settings_button2.set_icon("settings.png")
+        # settings_button2 = SCircleButton(self.window)
+        # settings_button2.set_icon("settings.png")
+        settings_button2 = QPushButton(self.window)
+        settings_button2.setText("Settings")
         settings_button2.clicked.connect(self.open_settings)
         self.icon_buttons.append(settings_button2)
 
-        ### Solution Screen Buttons
+        # Solution Screen Buttons
         # Solution Step Label -- Display step number out of total steps e.g. 1/3
         self.soln_step_label = QLabel(self.window)
         self.soln_step_label.setStyleSheet("font-size: 30px")
 
         # First Solution Button -- Skip to initial step.
-        first_soln_button = SCircleButton(self.window)
-        first_soln_button.set_icon("first.png")
+        # first_soln_button = SCircleButton(self.window)
+        # first_soln_button.set_icon("first.png")
+        first_soln_button = QPushButton(self.window)
+        first_soln_button.setText("<<")
         # Lambdas are necessary because object does not yet exist
-        first_soln_button.clicked.connect(lambda: self.simplex_solve.first_step())
+        first_soln_button.clicked.connect(
+            lambda: self.simplex_solve.first_step())
         self.icon_buttons.append(first_soln_button)
 
         # Previous Solution Button
-        prev_soln_button = SCircleButton(self.window)
-        prev_soln_button.set_icon("previous.png")
-        prev_soln_button.clicked.connect(lambda: self.simplex_solve.prev_step())
+        # prev_soln_button = SCircleButton(self.window)
+        # prev_soln_button.set_icon("previous.png")
+        prev_soln_button = QPushButton(self.window)
+        prev_soln_button.setText("<")
+        prev_soln_button.clicked.connect(
+            lambda: self.simplex_solve.prev_step())
         self.icon_buttons.append(prev_soln_button)
 
         # Next Solution Button
-        next_soln_button = SCircleButton(self.window)
-        next_soln_button.set_icon("next.png")
-        next_soln_button.clicked.connect(lambda: self.simplex_solve.next_step())
+        # next_soln_button = SCircleButton(self.window)
+        # next_soln_button.set_icon("next.png")
+        next_soln_button = QPushButton(self.window)
+        next_soln_button.setText(">")
+        next_soln_button.clicked.connect(
+            lambda: self.simplex_solve.next_step())
         self.icon_buttons.append(next_soln_button)
 
         # Last Solution Button
-        last_soln_button = SCircleButton(self.window)
-        last_soln_button.set_icon("last.png")
-        last_soln_button.clicked.connect(lambda: self.simplex_solve.last_step())
+        # last_soln_button = SCircleButton(self.window)
+        # last_soln_button.set_icon("last.png")
+        last_soln_button = QPushButton(self.window)
+        last_soln_button.setText(">>")
+        last_soln_button.clicked.connect(
+            lambda: self.simplex_solve.last_step())
         self.icon_buttons.append(last_soln_button)
 
-        ### Settings Screen Buttons
+        # Settings Screen Buttons
         # Toggle Dark Mode Button
         self.dark_mode_button = SSettingsButton(self.window, "Dark Mode")
         self.dark_mode_button.set_setting_label()
@@ -195,17 +224,18 @@ class SimplexCalculator:
             font_size_button.line_edit.clearFocus()))
 
         # Opens GitHub repo.
-        github_button = SSettingsButton(self.window, "Visit Simplex Calculator on GitHub")
+        github_button = SSettingsButton(
+            self.window, "Visit Simplex Calculator on GitHub")
         github_button.set_icon("github.png")
         github_button.clicked.connect(self.open_github)
         self.icon_buttons.append(github_button)
 
-        ### Layouts and Widget Placement
+        # Layouts and Widget Placement
         # Primary layout for main window -- All child layouts are placed here.
         parent_layout = QHBoxLayout()
         parent_layout.setContentsMargins(0, 12, 0, 12)
 
-        ### Setup Screen Layouts
+        # Setup Screen Layouts
         # Sublayouts for setup screen are placed here.
         setup_parent_layout = QGridLayout()
         # The initial set variables/constraints and maximize/minimize buttons and associated widgets go here.
@@ -227,7 +257,7 @@ class SimplexCalculator:
         setup_fields_layout.setContentsMargins(4, 4, 4, 4)
         setup_fields_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
 
-        ### Solution Screen Layouts
+        # Solution Screen Layouts
         # Sublayouts for solution screen are placed here.
         soln_parent_layout = QGridLayout()
         # Layout for displaying solution steps as labels. This will be a scroll area.
@@ -242,8 +272,10 @@ class SimplexCalculator:
         settings_layout.setAlignment(Qt.AlignTop)
 
         # Placement of initial setup button -- constraint/variable labels, +/- buttons, and edit fields.
-        setup_buttons_layout.addWidget(variables_label,      0, 0, 1, 3, Qt.AlignCenter)
-        setup_buttons_layout.addWidget(constraints_label,    0, 3, 1, 3, Qt.AlignCenter)
+        setup_buttons_layout.addWidget(
+            variables_label,      0, 0, 1, 3, Qt.AlignCenter)
+        setup_buttons_layout.addWidget(
+            constraints_label,    0, 3, 1, 3, Qt.AlignCenter)
         setup_buttons_layout.addWidget(variables_decrease,   1, 0)
         setup_buttons_layout.addWidget(variables_edit,       1, 1)
         setup_buttons_layout.addWidget(variables_increase,   1, 2)
@@ -260,7 +292,8 @@ class SimplexCalculator:
         setup_fields_layout.addLayout(inequality_layout)
 
         # These buttons will sit below solution step table.
-        soln_button_layout.addWidget(self.soln_step_label,   0, 0, 1, 4, Qt.AlignCenter)
+        soln_button_layout.addWidget(
+            self.soln_step_label,   0, 0, 1, 4, Qt.AlignCenter)
         soln_button_layout.addWidget(first_soln_button, 1, 0)
         soln_button_layout.addWidget(prev_soln_button,  1, 1)
         soln_button_layout.addWidget(next_soln_button,  1, 2)
@@ -285,14 +318,17 @@ class SimplexCalculator:
         soln_scroll_area.setFocusPolicy(Qt.NoFocus)
 
         # Placement of sublayouts and widgets in primary layouts.
-        setup_parent_layout.addWidget(settings_button,      0, 0, Qt.AlignRight)
-        setup_parent_layout.addLayout(setup_buttons_layout, 1, 0, Qt.AlignCenter)
+        setup_parent_layout.addWidget(
+            settings_button,      0, 0, Qt.AlignRight)
+        setup_parent_layout.addLayout(
+            setup_buttons_layout, 1, 0, Qt.AlignCenter)
         setup_parent_layout.addWidget(setup_scroll_area,    2, 0)
 
         soln_parent_layout.addWidget(back_button,        0, 0, Qt.AlignLeft)
         soln_parent_layout.addWidget(settings_button2,   0, 1, Qt.AlignRight)
         soln_parent_layout.addWidget(soln_scroll_area,   1, 0, 1, 2)
-        soln_parent_layout.addLayout(soln_button_layout, 2, 0, 1, 2, Qt.AlignCenter)
+        soln_parent_layout.addLayout(
+            soln_button_layout, 2, 0, 1, 2, Qt.AlignCenter)
 
         settings_layout.addWidget(back_button2,          0, 0)
         settings_layout.addWidget(self.dark_mode_button, 1, 0)
@@ -324,7 +360,8 @@ class SimplexCalculator:
         self.is_dark_mode = not self.is_dark_mode
         self.toggle_dark_mode()
         # Create object which destroys/creates all constraint and variable editing fields.
-        self.simplex_setup = SimplexSetup(self.window, setup_fields_layout, variables_edit, constraints_edit)
+        self.simplex_setup = SimplexSetup(
+            self.window, setup_fields_layout, variables_edit, constraints_edit)
         # Object which creates solution table when calculate_button is pressed goes here.
         self.simplex_solve = None
 
@@ -398,7 +435,7 @@ class SimplexCalculator:
             self.simplex_solve.delete()
         self.change_screens(self.soln_screen)
         self.simplex_solve = SimplexSolve(self.window, self.soln_table_layout, self.simplex_setup,
-            self.soln_step_label, self.is_maximize)
+                                          self.soln_step_label, self.is_maximize)
 
     def open_settings(self) -> None:
         """Open settings menu.
@@ -419,10 +456,11 @@ class SimplexCalculator:
         off_on = ["Off", "On"]
         self.dark_mode_button.setText(off_on[self.is_dark_mode])
         # Preserve current font size.
-        self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
+        self.window.setStyleSheet(
+            self.font_style + self.style_sheets[self.is_dark_mode])
         # Change all icon colors.
-        for button in self.icon_buttons:
-            button.icon.color_swap(self.is_dark_mode)
+        # for button in self.icon_buttons:
+        #     button.icon.color_swap(self.is_dark_mode)
 
     def change_font_size(self, font_size: int) -> None:
         """Changes font size via global style sheet from limited user input.
@@ -435,14 +473,15 @@ class SimplexCalculator:
         """
         # Updates self.font_style, concatenates it with the current dark/light mode style sheet, and sets it.
         self.font_style = (f"QWidget {{font-size: {font_size}px;}}")
-        self.window.setStyleSheet(self.font_style + self.style_sheets[self.is_dark_mode])
+        self.window.setStyleSheet(
+            self.font_style + self.style_sheets[self.is_dark_mode])
 
     def open_github(self) -> None:
         """Opens Simplex Calculator's GitHub repo in the default browser.
 
         https://github.com/nonetypes/SimplexCalculator
         """
-        webbrowser.get().open("https://github.com/nonetypes/SimplexCalculator", new = 2)
+        webbrowser.get().open("https://github.com/nonetypes/SimplexCalculator", new=2)
 
     def change_screens(self, new_screen: QFrame, is_going_back: bool = False) -> None:
         """Changes frame visibility to new QFrame.
@@ -471,11 +510,11 @@ class SimplexCalculator:
         # If back button was pressed, screen will appear to slide in from left.
         if is_going_back:
             self.animation.setStartValue(QRect(-self.window.width(), self.current_screen.y(),
-                self.window.width(), self.window.height()))
+                                               self.window.width(), self.window.height()))
         # If back button was not pressed, screen will appear to slide in from right.
         else:
             self.animation.setStartValue(QRect(self.window.width(), self.current_screen.y(),
-                self.window.width(), self.window.height()))
+                                               self.window.width(), self.window.height()))
 
         self.animation.setEndValue(self.current_screen.geometry())
         self.animation.start()
